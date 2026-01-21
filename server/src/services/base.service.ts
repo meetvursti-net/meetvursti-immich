@@ -5,6 +5,7 @@ import { SystemConfig } from 'src/config';
 import { SALT_ROUNDS } from 'src/constants';
 import { StorageCore } from 'src/cores/storage.core';
 import { UserAdmin } from 'src/database';
+import { AlbumUserRole } from 'src/enum';
 import { AccessRepository } from 'src/repositories/access.repository';
 import { ActivityRepository } from 'src/repositories/activity.repository';
 import { AlbumUserRepository } from 'src/repositories/album-user.repository';
@@ -239,6 +240,27 @@ export class BaseService {
     const user = await this.userRepository.create(payload);
 
     await this.eventRepository.emit('UserCreate', user);
+
+    const allUsers = await this.userRepository.getList({ withDeleted: false });
+    for (const existingUser of allUsers) {
+      if (existingUser.id === user.id) {
+        continue;
+      }
+      const partnerId1 = { sharedById: user.id, sharedWithId: existingUser.id };
+      const exists1 = await this.partnerRepository.get(partnerId1);
+      if (!exists1) {
+        await this.partnerRepository.create({ ...partnerId1, inTimeline: true });
+      } else if (!exists1.inTimeline) {
+        await this.partnerRepository.update(partnerId1, { inTimeline: true });
+      }
+      const partnerId2 = { sharedById: existingUser.id, sharedWithId: user.id };
+      const exists2 = await this.partnerRepository.get(partnerId2);
+      if (!exists2) {
+        await this.partnerRepository.create({ ...partnerId2, inTimeline: true });
+      } else if (!exists2.inTimeline) {
+        await this.partnerRepository.update(partnerId2, { inTimeline: true });
+      }
+    }
 
     return user;
   }
