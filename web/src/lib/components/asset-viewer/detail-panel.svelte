@@ -157,6 +157,17 @@
   <DetailPanelDescription {asset} {isOwner} />
   <DetailPanelRating {asset} {isOwner} />
 
+  {#if !authManager.isSharedLink && asset.owner && !isOwner}
+    <section class="px-4 pt-2">
+      <a
+        href={Route.viewPartner({ id: asset.owner.id })}
+        class="text-sm text-immich-primary dark:text-immich-dark-primary hover:underline"
+      >
+        {asset.owner.name}
+      </a>
+    </section>
+  {/if}
+
   {#if !authManager.isSharedLink}
     <section class="px-4 pt-4 text-sm">
       <div class="flex h-10 w-full items-center justify-between">
