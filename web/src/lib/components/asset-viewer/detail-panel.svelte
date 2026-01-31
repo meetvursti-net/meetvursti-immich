@@ -157,10 +157,10 @@
   <DetailPanelDescription {asset} {isOwner} />
   <DetailPanelRating {asset} {isOwner} />
 
-  {#if !authManager.isSharedLink && asset.owner && !isOwner}
+  {#if !authManager.isSharedLink && asset.owner}
     <section class="px-4 pt-2">
       <a
-        href={Route.viewPartner({ id: asset.owner.id })}
+        href={isOwner ? Route.myPhotos() : Route.viewPartner({ id: asset.owner.id })}
         class="text-sm text-immich-primary dark:text-immich-dark-primary hover:underline"
       >
         {asset.owner.name}

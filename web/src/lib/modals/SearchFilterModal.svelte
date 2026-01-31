@@ -10,6 +10,7 @@
     queryType: 'smart' | 'metadata' | 'description' | 'ocr';
     personIds: SvelteSet<string>;
     tagIds: SvelteSet<string> | null;
+    uploaderId?: string;
     location: SearchLocationFilter;
     camera: SearchCameraFilter;
     date: SearchDateFilter;
@@ -31,6 +32,7 @@
   import SearchRatingsSection from '$lib/components/shared-components/search-bar/search-ratings-section.svelte';
   import SearchTagsSection from '$lib/components/shared-components/search-bar/search-tags-section.svelte';
   import SearchTextSection from '$lib/components/shared-components/search-bar/search-text-section.svelte';
+  import SearchUploaderSection from '$lib/components/shared-components/search-bar/search-uploader-section.svelte';
   import { preferences } from '$lib/stores/user.store';
   import { parseUtcDate } from '$lib/utils/date-time';
   import { generateId } from '$lib/utils/generate-id';
@@ -43,10 +45,11 @@
 
   interface Props {
     searchQuery: MetadataSearchDto | SmartSearchDto;
+    defaultUploaderId?: string;
     onClose: (search?: SmartSearchDto | MetadataSearchDto) => void;
   }
 
-  let { searchQuery, onClose }: Props = $props();
+  let { searchQuery, defaultUploaderId, onClose }: Props = $props();
 
   const parseOptionalDate = (dateString?: DateTime) => (dateString ? parseUtcDate(dateString.toString()) : undefined);
   const toStartOfDayDate = (dateString: string) => parseUtcDate(dateString)?.startOf('day') || undefined;
@@ -85,6 +88,7 @@
           ? null
           : new SvelteSet(searchQuery.tagIds)
         : new SvelteSet(),
+    uploaderId: searchQuery.userId ?? defaultUploaderId,
     location: {
       country: withNullAsUndefined(searchQuery.country),
       state: withNullAsUndefined(searchQuery.state),
@@ -120,6 +124,7 @@
       queryType: defaultQueryType(), // retain from localStorage or default
       personIds: new SvelteSet(),
       tagIds: new SvelteSet(),
+      uploaderId: undefined,
       location: {},
       camera: {},
       date: {},
@@ -161,6 +166,7 @@
       isNotInAlbum: filter.display.isNotInAlbum || undefined,
       personIds: filter.personIds.size > 0 ? [...filter.personIds] : undefined,
       tagIds: filter.tagIds === null ? null : filter.tagIds.size > 0 ? [...filter.tagIds] : undefined,
+      userId: filter.uploaderId,
       type,
       rating: filter.rating,
     };
@@ -194,6 +200,9 @@
 
         <!-- TEXT -->
         <SearchTextSection bind:query={filter.query} bind:queryType={filter.queryType} />
+
+        <!-- UPLOADER -->
+        <SearchUploaderSection bind:selectedUploaderId={filter.uploaderId} onSearch={search} />
 
         <!-- TAGS -->
         <SearchTagsSection bind:selectedTags={filter.tagIds} />

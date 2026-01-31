@@ -59,7 +59,7 @@ export class SearchService extends BaseService {
 
     const page = dto.page ?? 1;
     const size = dto.size || 250;
-    const userIds = await this.getUserIdsToSearch(auth);
+    const userIds = await this.getUserIdsToSearch(auth, dto.userId);
     const { hasNextPage, items } = await this.searchRepository.searchMetadata(
       { page, size },
       {
@@ -74,7 +74,7 @@ export class SearchService extends BaseService {
   }
 
   async searchStatistics(auth: AuthDto, dto: StatisticsSearchDto): Promise<SearchStatisticsResponseDto> {
-    const userIds = await this.getUserIdsToSearch(auth);
+    const userIds = await this.getUserIdsToSearch(auth, dto.userId);
 
     return await this.searchRepository.searchStatistics({
       ...dto,
@@ -87,7 +87,7 @@ export class SearchService extends BaseService {
       requireElevatedPermission(auth);
     }
 
-    const userIds = await this.getUserIdsToSearch(auth);
+    const userIds = await this.getUserIdsToSearch(auth, dto.userId);
     const items = await this.searchRepository.searchRandom(dto.size || 250, { ...dto, userIds });
     return items.map((item) => mapAsset(item, { auth }));
   }
@@ -97,7 +97,7 @@ export class SearchService extends BaseService {
       requireElevatedPermission(auth);
     }
 
-    const userIds = await this.getUserIdsToSearch(auth);
+    const userIds = await this.getUserIdsToSearch(auth, dto.userId);
     const items = await this.searchRepository.searchLargeAssets(dto.size || 250, { ...dto, userIds });
     return items.map((item) => mapAsset(item, { auth }));
   }
@@ -112,7 +112,7 @@ export class SearchService extends BaseService {
       throw new BadRequestException('Smart search is not enabled');
     }
 
-    const userIds = this.getUserIdsToSearch(auth);
+    const userIds = this.getUserIdsToSearch(auth, dto.userId);
     let embedding;
     if (dto.query) {
       const key = machineLearning.clip.modelName + dto.query + dto.language;
@@ -186,13 +186,24 @@ export class SearchService extends BaseService {
     }
   }
 
-  private async getUserIdsToSearch(auth: AuthDto): Promise<string[]> {
+  private async getUserIdsToSearch(auth: AuthDto, filterUserId?: string): Promise<string[]> {
     const partnerIds = await getMyPartnerIds({
       userId: auth.user.id,
       repository: this.partnerRepository,
       timelineEnabled: true,
     });
-    return [auth.user.id, ...partnerIds];
+    const allowedUserIds = [auth.user.id, ...partnerIds];
+
+    // If a specific userId filter is provided, validate that it's in the allowed list
+    if (filterUserId) {
+      if (allowedUserIds.includes(filterUserId)) {
+        return [filterUserId];
+      }
+      // If the filter userId is not in the allowed list, return empty (no results)
+      return [];
+    }
+
+    return allowedUserIds;
   }
 
   private mapResponse(assets: MapAsset[], nextPage: string | null, options: AssetMapOptions): SearchResponseDto {

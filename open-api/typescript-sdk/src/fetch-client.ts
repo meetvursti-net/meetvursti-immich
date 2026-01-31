@@ -1130,6 +1130,7 @@ export type MetadataSearchDto = {
     "type"?: AssetTypeEnum;
     updatedAfter?: string;
     updatedBefore?: string;
+    userId?: string;
     visibility?: AssetVisibility;
     withDeleted?: boolean;
     withExif?: boolean;
@@ -1197,6 +1198,7 @@ export type RandomSearchDto = {
     "type"?: AssetTypeEnum;
     updatedAfter?: string;
     updatedBefore?: string;
+    userId?: string;
     visibility?: AssetVisibility;
     withDeleted?: boolean;
     withExif?: boolean;
@@ -1236,6 +1238,7 @@ export type SmartSearchDto = {
     "type"?: AssetTypeEnum;
     updatedAfter?: string;
     updatedBefore?: string;
+    userId?: string;
     visibility?: AssetVisibility;
     withDeleted?: boolean;
     withExif?: boolean;
@@ -1269,6 +1272,7 @@ export type StatisticsSearchDto = {
     "type"?: AssetTypeEnum;
     updatedAfter?: string;
     updatedBefore?: string;
+    userId?: string;
     visibility?: AssetVisibility;
 };
 export type SearchStatisticsResponseDto = {
@@ -4027,7 +4031,7 @@ export function getExploreData(opts?: Oazapfts.RequestOpts) {
 /**
  * Search large assets
  */
-export function searchLargeAssets({ albumIds, city, country, createdAfter, createdBefore, deviceId, isEncoded, isFavorite, isMotion, isNotInAlbum, isOffline, lensModel, libraryId, make, minFileSize, model, ocr, personIds, rating, size, state, tagIds, takenAfter, takenBefore, trashedAfter, trashedBefore, $type, updatedAfter, updatedBefore, visibility, withDeleted, withExif }: {
+export function searchLargeAssets({ albumIds, city, country, createdAfter, createdBefore, deviceId, isEncoded, isFavorite, isMotion, isNotInAlbum, isOffline, lensModel, libraryId, make, minFileSize, model, ocr, personIds, rating, size, state, tagIds, takenAfter, takenBefore, trashedAfter, trashedBefore, $type, updatedAfter, updatedBefore, userId, visibility, withDeleted, withExif }: {
     albumIds?: string[];
     city?: string | null;
     country?: string | null;
@@ -4057,6 +4061,7 @@ export function searchLargeAssets({ albumIds, city, country, createdAfter, creat
     $type?: AssetTypeEnum;
     updatedAfter?: string;
     updatedBefore?: string;
+    userId?: string;
     visibility?: AssetVisibility;
     withDeleted?: boolean;
     withExif?: boolean;
@@ -4094,6 +4099,7 @@ export function searchLargeAssets({ albumIds, city, country, createdAfter, creat
         "type": $type,
         updatedAfter,
         updatedBefore,
+        userId,
         visibility,
         withDeleted,
         withExif

@@ -13,6 +13,7 @@ export const isExternalUrl = (url: string): boolean => {
 };
 
 export const isPhotosRoute = (route?: string | null) => !!route?.startsWith('/(user)/photos/[[assetId=id]]');
+export const isMyPhotosRoute = (route?: string | null) => !!route?.startsWith('/(user)/my-photos/[[assetId=id]]');
 export const isSharedLinkRoute = (route?: string | null) =>
   !!route?.startsWith('/(user)/share/[key]') || !!route?.startsWith('/(user)/s/[slug]');
 export const isSearchRoute = (route?: string | null) => !!route?.startsWith('/(user)/search');
@@ -30,11 +31,15 @@ export function getAssetInfoFromParam({ assetId, slug, key }: { assetId?: string
 
 function currentUrlWithoutAsset() {
   const $page = get(page);
-  // This contains special casing for the /photos/:assetId route, which hangs directly
+  // This contains special casing for the /photos/:assetId and /my-photos/:assetId routes, which hang directly
   // off / instead of a subpath, unlike every other asset-containing route.
-  return isPhotosRoute($page.route.id)
-    ? Route.photos() + $page.url.search
-    : $page.url.pathname.replace(/(\/photos.*)$/, '') + $page.url.search;
+  if (isPhotosRoute($page.route.id)) {
+    return Route.photos() + $page.url.search;
+  }
+  if (isMyPhotosRoute($page.route.id)) {
+    return Route.myPhotos() + $page.url.search;
+  }
+  return $page.url.pathname.replace(/(\/photos.*)$/, '') + $page.url.search;
 }
 
 export function currentUrlReplaceAssetId(assetId: string) {
@@ -44,11 +49,15 @@ export function currentUrlReplaceAssetId(assetId: string) {
   params.delete('at');
   const paramsString = params.toString();
   const searchparams = paramsString == '' ? '' : '?' + params.toString();
-  // this contains special casing for the /photos/:assetId photos route, which hangs directly
+  // this contains special casing for the /photos/:assetId and /my-photos/:assetId routes, which hang directly
   // off / instead of a subpath, unlike every other asset-containing route.
-  return isPhotosRoute($page.route.id)
-    ? `${Route.viewAsset({ id: assetId })}${searchparams}`
-    : `${$page.url.pathname.replace(/\/photos\/[^/]+$/, '')}/photos/${assetId}${searchparams}`;
+  if (isPhotosRoute($page.route.id)) {
+    return `${Route.viewAsset({ id: assetId })}${searchparams}`;
+  }
+  if (isMyPhotosRoute($page.route.id)) {
+    return `${Route.viewAsset({ id: assetId })}${searchparams}`;
+  }
+  return `${$page.url.pathname.replace(/\/photos\/[^/]+$/, '')}/photos/${assetId}${searchparams}`;
 }
 
 function replaceScrollTarget(url: string, searchParams?: AssetGridRouteSearchParams | null) {

@@ -38,6 +38,7 @@
     type AssetResponseDto,
     getPerson,
     getTagById,
+    getUser,
     type MetadataSearchDto,
     searchAssets,
     searchSmart,
@@ -206,10 +207,11 @@
       lensModel: $t('lens_model'),
       personIds: $t('people'),
       tagIds: $t('tags'),
-      originalFileName: $t('file_name'),
+      originalFileName: $t('file_name_or_extension'),
       description: $t('description'),
       queryAssetId: $t('query_asset_id'),
       ocr: $t('ocr'),
+      userId: $t('uploader'),
     };
     return keyMap[key] || key;
   }
@@ -243,6 +245,11 @@
     );
 
     return tagNames.join(', ');
+  }
+
+  async function getUserName(userId: string) {
+    const user = await getUser({ id: userId });
+    return user.name;
   }
 
   const onAddToAlbum = (assetIds: string[]) => {
@@ -288,6 +295,10 @@
             {:else if searchKey === 'tagIds' && (Array.isArray(value) || value === null)}
               {#await getTagNames(value) then tagNames}
                 {tagNames}
+              {/await}
+            {:else if searchKey === 'userId' && typeof value === 'string'}
+              {#await getUserName(value) then userName}
+                {userName}
               {/await}
             {:else if value === null || value === ''}
               {$t('unknown')}

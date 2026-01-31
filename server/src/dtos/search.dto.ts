@@ -12,6 +12,9 @@ class BaseSearchDto {
   @ValidateUUID({ optional: true, nullable: true })
   libraryId?: string | null;
 
+  @ValidateUUID({ optional: true })
+  userId?: string;
+
   @IsString()
   @IsNotEmpty()
   @Optional()

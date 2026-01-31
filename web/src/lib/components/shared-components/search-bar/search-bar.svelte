@@ -1,12 +1,15 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { focusOutside } from '$lib/actions/focus-outside';
   import { shortcuts } from '$lib/actions/shortcut';
   import SearchFilterModal from '$lib/modals/SearchFilterModal.svelte';
   import { Route } from '$lib/route';
   import { searchStore } from '$lib/stores/search.svelte';
+  import { user } from '$lib/stores/user.store';
   import { handlePromiseError } from '$lib/utils';
   import { generateId } from '$lib/utils/generate-id';
+  import { isMyPhotosRoute } from '$lib/utils/navigation';
   import type { MetadataSearchDto, SmartSearchDto } from '@immich/sdk';
   import { Button, IconButton, modalManager } from '@immich/ui';
   import { mdiClose, mdiMagnify, mdiTune } from '@mdi/js';
@@ -18,9 +21,17 @@
     value?: string;
     grayTheme: boolean;
     searchQuery?: MetadataSearchDto | SmartSearchDto;
+    placeholder?: string;
   }
 
-  let { value = $bindable(''), grayTheme, searchQuery = {} }: Props = $props();
+  let { value = $bindable(''), grayTheme, searchQuery = {}, placeholder }: Props = $props();
+
+  // Determine if we're on the "My Photos" page
+  let isOnMyPhotosPage = $derived(isMyPhotosRoute($page.route.id));
+  let defaultUploaderId = $derived(isOnMyPhotosPage ? $user?.id : undefined);
+  let searchPlaceholder = $derived(
+    placeholder ?? (isOnMyPhotosPage ? $t('search_my_photos') : $t('search_all_photos')),
+  );
 
   let showClearIcon = $derived(value.length > 0);
 
@@ -112,7 +123,7 @@
       return;
     }
 
-    const result = modalManager.open(SearchFilterModal, { searchQuery });
+    const result = modalManager.open(SearchFilterModal, { searchQuery, defaultUploaderId });
     close = () => result.close();
     closeDropdown();
 
@@ -260,7 +271,7 @@
     role="search"
   >
     <div use:focusOutside={{ onFocusOut: closeDropdown }} tabindex="-1">
-      <label for="main-search-bar" class="sr-only">{$t('search_your_photos')}</label>
+      <label for="main-search-bar" class="sr-only">{searchPlaceholder}</label>
       <input
         type="text"
         name="q"
@@ -270,7 +281,7 @@
         {grayTheme ? 'dark:bg-immich-dark-gray' : 'dark:bg-immich-dark-bg'}
         {showSuggestions && isSearchSuggestions ? 'rounded-t-3xl' : 'rounded-3xl bg-gray-200'}
         {searchStore.isSearchEnabled ? 'border-gray-200 dark:border-gray-700 bg-white' : 'border-transparent'}"
-        placeholder={$t('search_your_photos')}
+        placeholder={searchPlaceholder}
         required
         pattern="^(?!m:$).*$"
         bind:value

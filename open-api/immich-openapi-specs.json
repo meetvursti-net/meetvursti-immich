@@ -9412,6 +9412,15 @@
             }
           },
           {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
             "name": "visibility",
             "required": false,
             "in": "query",
@@ -18401,6 +18410,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          },
           "visibility": {
             "allOf": [
               {
@@ -19946,6 +19959,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          },
           "visibility": {
             "allOf": [
               {
@@ -21101,6 +21118,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          },
           "visibility": {
             "allOf": [
               {
@@ -21291,6 +21312,10 @@
           },
           "updatedBefore": {
             "format": "date-time",
+            "type": "string"
+          },
+          "userId": {
+            "format": "uuid",
             "type": "string"
           },
           "visibility": {

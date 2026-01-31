@@ -92,6 +92,7 @@ export const Route = {
 
   // photos
   photos: (params?: { at?: string }) => '/photos' + asQueryString(params),
+  myPhotos: () => '/my-photos',
   viewAsset: ({ id }: { id: string }) => `/photos/${id}`,
   archive: () => '/archive',
   favorites: () => '/favorites',
