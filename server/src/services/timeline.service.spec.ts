@@ -14,6 +14,7 @@ describe(TimelineService.name, () => {
 
   describe('getTimeBuckets', () => {
     it("should return buckets if userId and albumId aren't set", async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       mocks.asset.getTimeBuckets.mockResolvedValue([{ timeBucket: 'bucket', count: 1 }]);
 
       await expect(sut.getTimeBuckets(authStub.admin, {})).resolves.toEqual(
@@ -27,6 +28,7 @@ describe(TimelineService.name, () => {
 
   describe('getTimeBucket', () => {
     it('should return the assets for a album time bucket if user has album.read', async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       mocks.access.album.checkOwnerAccess.mockResolvedValue(new Set(['album-id']));
       const json = `[{ id: ['asset-id'] }]`;
       mocks.asset.getTimeBucket.mockResolvedValue({ assets: json });
@@ -47,6 +49,7 @@ describe(TimelineService.name, () => {
     });
 
     it('should return the assets for a archive time bucket if user has archive.read', async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       const json = `[{ id: ['asset-id'] }]`;
       mocks.asset.getTimeBucket.mockResolvedValue({ assets: json });
 
@@ -94,6 +97,7 @@ describe(TimelineService.name, () => {
     });
 
     it('should check permissions to read tag', async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       const json = `[{ id: ['asset-id'] }]`;
       mocks.asset.getTimeBucket.mockResolvedValue({ assets: json });
       mocks.access.tag.checkOwnerAccess.mockResolvedValue(new Set(['tag-123']));
@@ -117,6 +121,7 @@ describe(TimelineService.name, () => {
     });
 
     it('should return the assets for a library time bucket if user has library.read', async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       const json = `[{ id: ['asset-id'] }]`;
       mocks.asset.getTimeBucket.mockResolvedValue({ assets: json });
 

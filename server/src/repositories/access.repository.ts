@@ -406,6 +406,23 @@ class PersonAccess {
 
   @GenerateSql({ params: [DummyValue.UUID, DummyValue.UUID_SET] })
   @ChunkedSet({ paramIndex: 1 })
+  async checkPartnerAccess(userId: string, personIds: Set<string>) {
+    if (personIds.size === 0) {
+      return new Set<string>();
+    }
+
+    return this.db
+      .selectFrom('partner')
+      .innerJoin('person', 'person.ownerId', 'partner.sharedById')
+      .select('person.id')
+      .where('partner.sharedWithId', '=', userId)
+      .where('person.id', 'in', [...personIds])
+      .execute()
+      .then((persons) => new Set(persons.map((person) => person.id)));
+  }
+
+  @GenerateSql({ params: [DummyValue.UUID, DummyValue.UUID_SET] })
+  @ChunkedSet({ paramIndex: 1 })
   async checkFaceOwnerAccess(userId: string, assetFaceIds: Set<string>) {
     if (assetFaceIds.size === 0) {
       return new Set<string>();
@@ -417,6 +434,26 @@ class PersonAccess {
       .leftJoin('asset', (join) => join.onRef('asset.id', '=', 'asset_face.assetId').on('asset.deletedAt', 'is', null))
       .where('asset_face.id', 'in', [...assetFaceIds])
       .where('asset.ownerId', '=', userId)
+      .execute()
+      .then((faces) => new Set(faces.map((face) => face.id)));
+  }
+
+  @GenerateSql({ params: [DummyValue.UUID, DummyValue.UUID_SET] })
+  @ChunkedSet({ paramIndex: 1 })
+  async checkFacePartnerAccess(userId: string, assetFaceIds: Set<string>) {
+    if (assetFaceIds.size === 0) {
+      return new Set<string>();
+    }
+
+    return this.db
+      .selectFrom('partner')
+      .innerJoin('asset', 'asset.ownerId', 'partner.sharedById')
+      .innerJoin('asset_face', 'asset_face.assetId', 'asset.id')
+      .select('asset_face.id')
+      .where('partner.sharedWithId', '=', userId)
+      .where('asset_face.id', 'in', [...assetFaceIds])
+      .where('asset.deletedAt', 'is', null)
+      .where('asset_face.deletedAt', 'is', null)
       .execute()
       .then((faces) => new Set(faces.map((face) => face.id)));
   }

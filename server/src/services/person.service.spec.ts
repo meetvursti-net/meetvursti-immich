@@ -70,6 +70,7 @@ describe(PersonService.name, () => {
 
   describe('getAll', () => {
     it('should get all hidden and visible people with thumbnails', async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       mocks.person.getAllForUser.mockResolvedValue({
         items: [personStub.withName, personStub.hidden],
         hasNextPage: false,
@@ -93,13 +94,14 @@ describe(PersonService.name, () => {
           },
         ],
       });
-      expect(mocks.person.getAllForUser).toHaveBeenCalledWith({ skip: 0, take: 10 }, authStub.admin.user.id, {
+      expect(mocks.person.getAllForUser).toHaveBeenCalledWith({ skip: 0, take: 10 }, [authStub.admin.user.id], {
         minimumFaceCount: 3,
         withHidden: true,
       });
     });
 
     it('should get all visible people and favorites should be first in the array', async () => {
+      mocks.partner.getAll.mockResolvedValue([]);
       mocks.person.getAllForUser.mockResolvedValue({
         items: [personStub.isFavorite, personStub.withName],
         hasNextPage: false,
@@ -123,7 +125,7 @@ describe(PersonService.name, () => {
           responseDto,
         ],
       });
-      expect(mocks.person.getAllForUser).toHaveBeenCalledWith({ skip: 0, take: 10 }, authStub.admin.user.id, {
+      expect(mocks.person.getAllForUser).toHaveBeenCalledWith({ skip: 0, take: 10 }, [authStub.admin.user.id], {
         minimumFaceCount: 3,
         withHidden: false,
       });
@@ -353,6 +355,7 @@ describe(PersonService.name, () => {
   describe('getFacesById', () => {
     it('should get the bounding boxes for an asset', async () => {
       mocks.access.asset.checkOwnerAccess.mockResolvedValue(new Set([faceStub.face1.assetId]));
+      mocks.partner.getAll.mockResolvedValue([]);
       mocks.person.getFaces.mockResolvedValue([faceStub.primaryFace1]);
       mocks.asset.getById.mockResolvedValue(assetStub.image);
       await expect(sut.getFacesById(authStub.admin, { id: faceStub.face1.assetId })).resolves.toStrictEqual([
@@ -1172,6 +1175,11 @@ describe(PersonService.name, () => {
 
     it('should not map person if person does not match auth user id', () => {
       expect(mapFaces(faceStub.face1, authStub.user1).person).toBeNull();
+    });
+
+    it('should map person if person owner is a partner', () => {
+      const partnerIds = [faceStub.face1.person.ownerId];
+      expect(mapFaces(faceStub.face1, authStub.user1, partnerIds).person).toEqual(mapPerson(personStub.withName));
     });
   });
 });

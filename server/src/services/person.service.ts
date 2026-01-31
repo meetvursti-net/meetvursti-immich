@@ -40,7 +40,7 @@ import { AssetFaceTable } from 'src/schema/tables/asset-face.table';
 import { FaceSearchTable } from 'src/schema/tables/face-search.table';
 import { BaseService } from 'src/services/base.service';
 import { JobItem, JobOf } from 'src/types';
-import { getDimensions } from 'src/utils/asset.util';
+import { getDimensions, getMyPartnerIds } from 'src/utils/asset.util';
 import { ImmichFileResponse } from 'src/utils/file';
 import { mimeTypes } from 'src/utils/mime-types';
 import { isFacialRecognitionEnabled } from 'src/utils/misc';
@@ -62,13 +62,22 @@ export class PersonService extends BaseService {
       }
       closestFaceAssetId = person.faceAssetId;
     }
+
+    // Get partner IDs to include their people
+    const partnerIds = await getMyPartnerIds({ userId: auth.user.id, repository: this.partnerRepository });
+    const userIds = [auth.user.id, ...partnerIds];
+
     const { machineLearning } = await this.getConfig({ withCache: false });
-    const { items, hasNextPage } = await this.personRepository.getAllForUser(pagination, auth.user.id, {
+    const { items, hasNextPage } = await this.personRepository.getAllForUser(pagination, userIds, {
       minimumFaceCount: machineLearning.facialRecognition.minFaces,
       withHidden,
       closestFaceAssetId,
     });
-    const { total, hidden } = await this.personRepository.getNumberOfPeople(auth.user.id);
+
+    // Get counts for current user and all partners
+    const peopleCounts = await Promise.all(userIds.map((userId) => this.personRepository.getNumberOfPeople(userId)));
+    const total = peopleCounts.reduce((sum, count) => sum + count.total, 0);
+    const hidden = peopleCounts.reduce((sum, count) => sum + count.hidden, 0);
 
     return {
       people: items.map((person) => mapPerson(person)),
@@ -130,7 +139,10 @@ export class PersonService extends BaseService {
     const asset = await this.assetRepository.getById(dto.id, { edits: true, exifInfo: true });
     const assetDimensions = getDimensions(asset!.exifInfo!);
 
-    return faces.map((face) => mapFaces(face, auth, asset!.edits!, assetDimensions));
+    // Get partner IDs to show their people on faces
+    const partnerIds = await getMyPartnerIds({ userId: auth.user.id, repository: this.partnerRepository });
+
+    return faces.map((face) => mapFaces(face, auth, partnerIds, asset!.edits!, assetDimensions));
   }
 
   async createNewFeaturePhoto(changeFeaturePhoto: string[]) {

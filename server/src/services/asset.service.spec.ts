@@ -116,6 +116,7 @@ describe(AssetService.name, () => {
     it('should allow owner access', async () => {
       mocks.access.asset.checkOwnerAccess.mockResolvedValue(new Set([assetStub.image.id]));
       mocks.asset.getById.mockResolvedValue(assetStub.image);
+      mocks.partner.getAll.mockResolvedValue([]);
 
       await sut.get(authStub.admin, assetStub.image.id);
 
@@ -158,6 +159,7 @@ describe(AssetService.name, () => {
     it('should allow partner sharing access', async () => {
       mocks.access.asset.checkPartnerAccess.mockResolvedValue(new Set([assetStub.image.id]));
       mocks.asset.getById.mockResolvedValue(assetStub.image);
+      mocks.partner.getAll.mockResolvedValue([]);
 
       await sut.get(authStub.admin, assetStub.image.id);
 
@@ -170,6 +172,7 @@ describe(AssetService.name, () => {
     it('should allow shared album access', async () => {
       mocks.access.asset.checkAlbumAccess.mockResolvedValue(new Set([assetStub.image.id]));
       mocks.asset.getById.mockResolvedValue(assetStub.image);
+      mocks.partner.getAll.mockResolvedValue([]);
 
       await sut.get(authStub.admin, assetStub.image.id);
 

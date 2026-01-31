@@ -97,10 +97,18 @@ export class AssetService extends BaseService {
 
     if (auth.sharedLink) {
       delete data.owner;
-    }
-
-    if (data.ownerId !== auth.user.id || auth.sharedLink) {
       data.people = [];
+    } else {
+      // Get partner IDs to allow partners to see tagged people
+      const partnerIds = await getMyPartnerIds({
+        userId: auth.user.id,
+        repository: this.partnerRepository,
+        timelineEnabled: true,
+      });
+      const isOwnerOrPartner = data.ownerId === auth.user.id || partnerIds.includes(data.ownerId);
+      if (!isOwnerOrPartner) {
+        data.people = [];
+      }
     }
 
     return data;

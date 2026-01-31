@@ -149,7 +149,9 @@ export class PersonRepository {
   }
 
   @GenerateSql({ params: [{ take: 1, skip: 0 }, DummyValue.UUID] })
-  async getAllForUser(pagination: PaginationOptions, userId: string, options?: PersonSearchOptions) {
+  async getAllForUser(pagination: PaginationOptions, userIds: string | string[], options?: PersonSearchOptions) {
+    const userIdArray = Array.isArray(userIds) ? userIds : [userIds];
+
     const items = await this.db
       .selectFrom('person')
       .selectAll('person')
@@ -160,7 +162,7 @@ export class PersonRepository {
           .on('asset.visibility', '=', sql.lit(AssetVisibility.Timeline))
           .on('asset.deletedAt', 'is', null),
       )
-      .where('person.ownerId', '=', userId)
+      .where('person.ownerId', 'in', userIdArray)
       .where('asset_face.deletedAt', 'is', null)
       .where('asset_face.isVisible', 'is', true)
       .orderBy('person.isHidden', 'asc')

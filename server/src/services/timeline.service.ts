@@ -27,16 +27,22 @@ export class TimelineService extends BaseService {
 
   private async buildTimeBucketOptions(auth: AuthDto, dto: TimeBucketDto): Promise<TimeBucketOptions> {
     const { userId, ...options } = dto;
+
+    // Always include partners when viewing a specific person's photos
+    // This allows users to see assets from all partners that contain the person
+    const partnerIds = await getMyPartnerIds({
+      userId: auth.user.id,
+      repository: this.partnerRepository,
+    });
+
     let userIds: string[] | undefined = undefined;
 
-    if (userId) {
+    if (dto.personId) {
+      // When filtering by personId, include all partners' assets
+      userIds = [auth.user.id, ...partnerIds];
+    } else if (userId) {
       userIds = [userId];
       if (dto.withPartners) {
-        const partnerIds = await getMyPartnerIds({
-          userId: auth.user.id,
-          repository: this.partnerRepository,
-          timelineEnabled: true,
-        });
         userIds.push(...partnerIds);
       }
     }

@@ -262,11 +262,14 @@ export function mapFacesWithoutPerson(
 export function mapFaces(
   face: AssetFace,
   auth: AuthDto,
+  partnerIds: string[] = [],
   edits?: AssetEditActionItem[],
   assetDimensions?: ImageDimensions,
 ): AssetFaceResponseDto {
+  const isOwnerOrPartner = face.person?.ownerId === auth.user.id || partnerIds.includes(face.person?.ownerId ?? '');
+
   return {
     ...mapFacesWithoutPerson(face, edits, assetDimensions),
-    person: face.person?.ownerId === auth.user.id ? mapPerson(face.person) : null,
+    person: isOwnerOrPartner && face.person ? mapPerson(face.person) : null,
   };
 }
