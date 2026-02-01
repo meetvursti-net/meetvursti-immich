@@ -1,5 +1,13 @@
 import { browser } from '$app/environment';
 
+// Check if it's a mobile device
+const isMobileDevice = () => {
+  if (!browser) {
+    return false;
+  }
+  return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+};
+
 // Session-only state for detail panel - defaults to true on desktop
 const getInitialDetailPanelState = () => {
   if (!browser) {
@@ -52,6 +60,13 @@ export class AssetViewerManager {
 
   closeDetailPanel() {
     this.isShowDetailPanel = false;
+  }
+
+  // Reset detail panel state for mobile when opening a new asset
+  resetForNewAsset() {
+    if (isMobileDevice()) {
+      this.isShowDetailPanel = false;
+    }
   }
 }
 

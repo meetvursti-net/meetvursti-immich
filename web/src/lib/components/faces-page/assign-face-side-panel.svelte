@@ -73,9 +73,9 @@
 
 <section
   transition:fly={{ x: 360, duration: 100, easing: linear }}
-  class="absolute top-0 h-full w-90 overflow-x-hidden p-2 dark:text-immich-dark-fg bg-light"
+  class="absolute top-0 h-full w-90 dark:text-immich-dark-fg bg-light flex flex-col"
 >
-  <div class="flex place-items-center justify-between gap-2">
+  <div class="sticky top-0 z-10 bg-light p-2 flex place-items-center justify-between gap-2">
     {#if !searchFaces}
       <div class="flex items-center gap-2">
         <IconButton
@@ -146,7 +146,7 @@
       />
     {/if}
   </div>
-  <div class="px-4 py-4 text-sm">
+  <div class="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 text-sm">
     <h2 class="mb-8 mt-4">{$t('all_people')}</h2>
     {#if isShowLoadingPeople}
       <div class="flex w-full justify-center">

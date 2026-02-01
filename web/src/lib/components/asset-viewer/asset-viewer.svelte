@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { focusTrap } from '$lib/actions/focus-trap';
+  import { swipe } from '$lib/actions/swipe';
   import type { Action, OnAction, PreAction } from '$lib/components/asset-viewer/actions/action';
   import NextAssetAction from '$lib/components/asset-viewer/actions/next-asset-action.svelte';
   import PreviousAssetAction from '$lib/components/asset-viewer/actions/previous-asset-action.svelte';
@@ -114,6 +115,71 @@
 
   let zoomToggle = $state(() => void 0);
   let playOriginalVideo = $state($alwaysLoadOriginalVideo);
+  let isEditingFaces = $state(false);
+
+  // Swipe gesture state for mobile detail panel
+  let swipeStartY = $state(0);
+  let swipeCurrentY = $state(0);
+  let isSwiping = $state(false);
+  const SWIPE_THRESHOLD = 50;
+
+  const handleSwipeStart = (e: TouchEvent) => {
+    if (isEditingFaces) return;
+    swipeStartY = e.touches[0].clientY;
+    swipeCurrentY = swipeStartY;
+    isSwiping = true;
+  };
+
+  const handleSwipeMove = (e: TouchEvent) => {
+    if (!isSwiping || isEditingFaces) return;
+    swipeCurrentY = e.touches[0].clientY;
+  };
+
+  const handleSwipeEnd = () => {
+    if (!isSwiping || isEditingFaces) {
+      isSwiping = false;
+      return;
+    }
+
+    const swipeDistance = swipeCurrentY - swipeStartY;
+
+    // Swipe down to close panel
+    if (assetViewerManager.isShowDetailPanel && swipeDistance > SWIPE_THRESHOLD) {
+      assetViewerManager.closeDetailPanel();
+    }
+
+    isSwiping = false;
+    swipeStartY = 0;
+    swipeCurrentY = 0;
+  };
+
+  // Handle swipe up from bottom to open panel
+  let bottomSwipeStartY = $state(0);
+  let isBottomSwiping = $state(false);
+
+  const handleBottomSwipeStart = (e: TouchEvent) => {
+    if (isEditingFaces || assetViewerManager.isShowDetailPanel) return;
+    bottomSwipeStartY = e.touches[0].clientY;
+    isBottomSwiping = true;
+  };
+
+  const handleBottomSwipeMove = (e: TouchEvent) => {
+    if (!isBottomSwiping || isEditingFaces) return;
+    const currentY = e.touches[0].clientY;
+    const swipeDistance = bottomSwipeStartY - currentY;
+
+    // Swipe up to open panel
+    if (swipeDistance > SWIPE_THRESHOLD) {
+      assetViewerManager.toggleDetailPanel();
+      isBottomSwiping = false;
+      bottomSwipeStartY = 0;
+    }
+  };
+
+  const handleBottomSwipeEnd = () => {
+    isBottomSwiping = false;
+    bottomSwipeStartY = 0;
+  };
 
   const setPlayOriginalVideo = (value: boolean) => {
     playOriginalVideo = value;
@@ -150,6 +216,9 @@
   };
 
   onMount(async () => {
+    // Reset detail panel for mobile on new asset view
+    assetViewerManager.resetForNewAsset();
+
     unsubscribes.push(
       slideshowState.subscribe((value) => {
         if (value === SlideshowState.PlaySlideshow) {
@@ -489,7 +558,11 @@
   {/if}
 
   <!-- Asset Viewer -->
-  <div class="z-[-1] relative col-start-1 col-span-4 row-start-1 row-span-full">
+  <div
+    class="z-[-1] relative col-start-1 col-span-4 row-start-1 row-span-full transition-all duration-150 {assetViewerManager.isShowDetailPanel
+      ? 'max-md:h-1/3 max-md:overflow-hidden'
+      : ''}"
+  >
     {#if viewerKind === 'StackPhotoViewer'}
       <PhotoViewer
         bind:zoomToggle
@@ -566,7 +639,7 @@
     {/if}
 
     {#if showOcrButton}
-      <div class="absolute bottom-0 end-0 mb-6 me-6">
+      <div class="absolute bottom-0 end-0 me-6 z-20 mb-6 {assetViewerManager.isShowDetailPanel ? '' : 'max-md:mb-14'}">
         <OcrButton />
       </div>
     {/if}
@@ -582,10 +655,38 @@
     <div
       transition:fly={{ duration: 150 }}
       id="detail-panel"
-      class="row-start-1 row-span-4 w-90 overflow-y-auto transition-all dark:border-l dark:border-s-immich-dark-gray bg-light"
+      class="fixed md:relative bottom-0 md:bottom-auto left-0 md:left-auto right-0 md:right-auto
+        h-2/3 md:h-auto w-full md:w-90
+        row-start-1 row-span-4
+        overflow-y-auto transition-all
+        dark:border-t md:dark:border-t-0 dark:border-l-0 md:dark:border-l dark:border-s-immich-dark-gray
+        bg-light z-10 md:z-auto
+        rounded-t-2xl md:rounded-none"
       translate="yes"
     >
-      <DetailPanel {asset} currentAlbum={album} albums={appearsInAlbums} />
+      <DetailPanel
+        {asset}
+        currentAlbum={album}
+        albums={appearsInAlbums}
+        onEditStateChange={(editing) => (isEditingFaces = editing)}
+        onSwipeStart={handleSwipeStart}
+        onSwipeMove={handleSwipeMove}
+        onSwipeEnd={handleSwipeEnd}
+      />
+    </div>
+  {/if}
+
+  <!-- Swipe-up zone for opening detail panel on mobile -->
+  {#if asset.hasMetadata && $slideshowState === SlideshowState.None && !assetViewerManager.isShowDetailPanel && !isShowEditor}
+    <div
+      class="md:hidden fixed bottom-0 left-0 right-0 h-12 z-10 flex justify-center items-start pt-1"
+      use:swipe={{
+        onSwipeStart: handleBottomSwipeStart,
+        onSwipeMove: handleBottomSwipeMove,
+        onSwipeEnd: handleBottomSwipeEnd,
+      }}
+    >
+      <div class="w-10 h-1 bg-white/50 rounded-full"></div>
     </div>
   {/if}
 

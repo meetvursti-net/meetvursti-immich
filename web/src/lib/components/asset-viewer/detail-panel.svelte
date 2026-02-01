@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { swipe } from '$lib/actions/swipe';
   import DetailPanelDescription from '$lib/components/asset-viewer/detail-panel-description.svelte';
   import DetailPanelLocation from '$lib/components/asset-viewer/detail-panel-location.svelte';
   import DetailPanelRating from '$lib/components/asset-viewer/detail-panel-star-rating.svelte';
@@ -46,9 +47,21 @@
     asset: AssetResponseDto;
     albums?: AlbumResponseDto[];
     currentAlbum?: AlbumResponseDto | null;
+    onEditStateChange?: (isEditing: boolean) => void;
+    onSwipeStart?: (e: TouchEvent) => void;
+    onSwipeMove?: (e: TouchEvent) => void;
+    onSwipeEnd?: () => void;
   }
 
-  let { asset, albums = [], currentAlbum = null }: Props = $props();
+  let {
+    asset,
+    albums = [],
+    currentAlbum = null,
+    onEditStateChange,
+    onSwipeStart,
+    onSwipeMove,
+    onSwipeEnd,
+  }: Props = $props();
 
   let showAssetPath = $state(false);
   let showEditFaces = $state(false);
@@ -86,6 +99,11 @@
     }
   });
 
+  // Notify parent when edit state changes
+  $effect(() => {
+    onEditStateChange?.(showEditFaces);
+  });
+
   const getMegapixel = (width: number, height: number): number | undefined => {
     const megapixel = Math.round((height * width) / 1_000_000);
 
@@ -121,19 +139,34 @@
   };
 </script>
 
-<section class="relative p-2">
-  <div class="flex place-items-center gap-2">
-    <IconButton
-      icon={mdiClose}
-      aria-label={$t('close')}
-      onclick={() => assetViewerManager.closeDetailPanel()}
-      shape="round"
-      color="secondary"
-      variant="ghost"
-    />
-    <p class="text-lg text-immich-fg dark:text-immich-dark-fg">{$t('info')}</p>
+{#if !showEditFaces}
+  <div
+    class="sticky top-0 z-10 bg-light border-b dark:border-gray-700 md:cursor-default cursor-grab"
+    use:swipe={{
+      onSwipeStart: onSwipeStart,
+      onSwipeMove: onSwipeMove,
+      onSwipeEnd: onSwipeEnd,
+    }}
+  >
+    <!-- Swipe handle indicator for mobile -->
+    <div class="md:hidden w-full flex justify-center pt-2">
+      <div class="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+    </div>
+    <div class="p-2 flex place-items-center gap-2">
+      <IconButton
+        icon={mdiClose}
+        aria-label={$t('close')}
+        onclick={() => assetViewerManager.closeDetailPanel()}
+        shape="round"
+        color="secondary"
+        variant="ghost"
+      />
+      <p class="text-lg text-immich-fg dark:text-immich-dark-fg">{$t('info')}</p>
+    </div>
   </div>
+{/if}
 
+<section class="relative p-2">
   {#if asset.isOffline}
     <section class="px-4 py-4">
       <div role="alert">
@@ -163,8 +196,9 @@
     <section class="px-4 pt-2">
       <a
         href={isOwner ? Route.myPhotos() : Route.viewPartner({ id: asset.owner.id })}
-        class="text-sm text-immich-primary dark:text-immich-dark-primary hover:underline"
+        class="flex items-center gap-2 text-sm text-immich-primary dark:text-immich-dark-primary hover:underline"
       >
+        <UserAvatar user={asset.owner} size="md" />
         {asset.owner.name}
       </a>
     </section>
@@ -175,7 +209,7 @@
   {/if}
 
   {#if !authManager.isSharedLink}
-    <section class="px-4 pt-4 text-sm">
+    <section class="px-4 pt-2 text-sm">
       <div class="flex h-10 w-full items-center justify-between">
         <Text size="small" color="muted">{$t('people')}</Text>
         <div class="flex gap-2 items-center">
@@ -273,7 +307,7 @@
     </section>
   {/if}
 
-  <div class="px-4 py-4">
+  <div class="px-4 py-2">
     {#if asset.exifInfo}
       <div class="flex h-10 w-full items-center justify-between text-sm">
         <Text size="small" color="muted">{$t('details')}</Text>
@@ -285,7 +319,7 @@
     {#if dateTime}
       <button
         type="button"
-        class="flex w-full text-start justify-between place-items-start gap-4 py-4"
+        class="flex w-full text-start justify-between place-items-start gap-4 py-1.5 text-sm"
         onclick={handleChangeDate}
         title={isOwner ? $t('edit_date') : ''}
         class:hover:text-primary={isOwner}
@@ -306,7 +340,7 @@
                 { locale: $locale },
               )}
             </p>
-            <div class="flex gap-2 text-sm">
+            <div class="flex gap-2 text-xs">
               <p>
                 {dateTime.toLocaleString(
                   {
@@ -330,7 +364,7 @@
         {/if}
       </button>
     {:else if !dateTime && isOwner}
-      <div class="flex justify-between place-items-start gap-4 py-4">
+      <div class="flex justify-between place-items-start gap-4 py-1.5">
         <div class="flex gap-4">
           <div>
             <Icon icon={mdiCalendar} size="24" />
@@ -342,7 +376,7 @@
       </div>
     {/if}
 
-    <div class="flex gap-4 py-4">
+    <div class="flex gap-4 py-1.5 text-sm">
       <div><Icon icon={mdiImageOutline} size="24" /></div>
 
       <div>
@@ -369,7 +403,7 @@
           </p>
         {/if}
         {#if (asset.exifInfo?.exifImageHeight && asset.exifInfo?.exifImageWidth) || asset.exifInfo?.fileSizeInByte}
-          <div class="flex gap-2 text-sm">
+          <div class="flex gap-2 text-xs">
             {#if asset.exifInfo?.exifImageHeight && asset.exifInfo?.exifImageWidth}
               {#if getMegapixel(asset.exifInfo.exifImageHeight, asset.exifInfo.exifImageWidth)}
                 <p>
@@ -387,12 +421,12 @@
       </div>
     </div>
 
-    <div class="flex gap-4 py-4">
+    <div class="flex gap-4 py-1.5 text-sm">
       <div><Icon icon={mdiCloudUploadOutline} size="24" /></div>
 
       <div>
         <p>{$t('uploaded')}</p>
-        <p class="text-sm">
+        <p class="text-xs">
           {uploadDateTime.toLocaleString(
             {
               month: 'short',
@@ -408,7 +442,7 @@
     </div>
 
     {#if asset.exifInfo?.make || asset.exifInfo?.model || asset.exifInfo?.exposureTime || asset.exifInfo?.iso}
-      <div class="flex gap-4 py-4">
+      <div class="flex gap-4 py-1.5 text-sm">
         <div><Icon icon={mdiCamera} size="24" /></div>
 
         <div>
@@ -428,7 +462,7 @@
             </p>
           {/if}
 
-          <div class="flex gap-2 text-sm">
+          <div class="flex gap-2 text-xs">
             {#if asset.exifInfo.exposureTime}
               <p>{`${asset.exifInfo.exposureTime} s`}</p>
             {/if}
@@ -442,7 +476,7 @@
     {/if}
 
     {#if asset.exifInfo?.lensModel || asset.exifInfo?.fNumber || asset.exifInfo?.focalLength}
-      <div class="flex gap-4 py-4">
+      <div class="flex gap-4 py-1.5 text-sm">
         <div><Icon icon={mdiCameraIris} size="24" /></div>
 
         <div>
@@ -458,7 +492,7 @@
             </p>
           {/if}
 
-          <div class="flex gap-2 text-sm">
+          <div class="flex gap-2 text-xs">
             {#if asset.exifInfo?.fNumber}
               <p>ƒ/{asset.exifInfo.fNumber.toLocaleString($locale)}</p>
             {/if}
@@ -523,9 +557,9 @@
 {/if}
 
 {#if currentAlbum && currentAlbum.albumUsers.length > 0 && asset.owner}
-  <section class="px-6 dark:text-immich-dark-fg mt-4">
+  <section class="px-4 dark:text-immich-dark-fg mt-2">
     <Text size="small" color="muted">{$t('shared_by')}</Text>
-    <div class="flex gap-4 pt-4">
+    <div class="flex gap-4 pt-2">
       <div>
         <UserAvatar user={asset.owner} size="md" />
       </div>
@@ -540,8 +574,8 @@
 {/if}
 
 {#if albums.length > 0}
-  <section class="px-6 py-6 dark:text-immich-dark-fg">
-    <div class="pb-4">
+  <section class="px-4 py-4 dark:text-immich-dark-fg">
+    <div class="pb-2">
       <Text size="small" color="muted">{$t('appears_in')}</Text>
     </div>
     {#each albums as album (album.id)}

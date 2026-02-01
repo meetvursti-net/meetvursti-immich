@@ -37,7 +37,7 @@
 {#if asset.exifInfo?.country}
   <button
     type="button"
-    class="flex w-full text-start justify-between place-items-start gap-4 py-4"
+    class="flex w-full text-start justify-between place-items-start gap-4 py-1.5 text-sm"
     onclick={() => (isOwner ? (isShowChangeLocation = true) : null)}
     title={isOwner ? $t('edit_location') : ''}
     class:hover:text-primary={isOwner}
@@ -50,12 +50,12 @@
           <p>{asset.exifInfo.city}</p>
         {/if}
         {#if asset.exifInfo?.state}
-          <div class="flex gap-2 text-sm">
+          <div class="flex gap-2 text-xs">
             <p>{asset.exifInfo.state}</p>
           </div>
         {/if}
         {#if asset.exifInfo?.country}
-          <div class="flex gap-2 text-sm">
+          <div class="flex gap-2 text-xs">
             <p>{asset.exifInfo.country}</p>
           </div>
         {/if}
@@ -71,7 +71,7 @@
 {:else if !asset.exifInfo?.city && isOwner}
   <button
     type="button"
-    class="flex w-full text-start justify-between place-items-start gap-4 py-4 rounded-lg hover:text-primary"
+    class="flex w-full text-start justify-between place-items-start gap-4 py-1.5 text-sm rounded-lg hover:text-primary"
     onclick={() => (isShowChangeLocation = true)}
     title={$t('add_location')}
   >

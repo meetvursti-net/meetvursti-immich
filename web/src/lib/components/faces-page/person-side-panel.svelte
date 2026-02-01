@@ -187,9 +187,11 @@
 
 <section
   transition:fly={{ x: 360, duration: 100, easing: linear }}
-  class="absolute top-0 h-full w-90 overflow-x-hidden p-2 dark:text-immich-dark-fg bg-light"
+  class="absolute top-0 left-0 right-0 h-full overflow-y-auto dark:text-immich-dark-fg bg-light"
 >
-  <div class="flex place-items-center justify-between gap-2">
+  <div
+    class="sticky top-0 z-10 bg-light p-2 flex place-items-center justify-between gap-2 border-b dark:border-gray-700"
+  >
     <div class="flex items-center gap-2">
       <IconButton
         shape="round"
