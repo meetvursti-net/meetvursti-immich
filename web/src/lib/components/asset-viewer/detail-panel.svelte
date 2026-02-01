@@ -26,6 +26,7 @@
     mdiCamera,
     mdiCameraIris,
     mdiClose,
+    mdiCloudUploadOutline,
     mdiEye,
     mdiEyeOff,
     mdiImageOutline,
@@ -61,6 +62,7 @@
       ? fromISODateTime(asset.exifInfo.dateTimeOriginal, timeZone)
       : fromISODateTimeUTC(asset.localDateTime),
   );
+  let uploadDateTime = $derived(DateTime.fromISO(asset.createdAt));
   let latlng = $derived(
     (() => {
       const lat = asset.exifInfo?.latitude;
@@ -378,6 +380,26 @@
             {/if}
           </div>
         {/if}
+      </div>
+    </div>
+
+    <div class="flex gap-4 py-4">
+      <div><Icon icon={mdiCloudUploadOutline} size="24" /></div>
+
+      <div>
+        <p>{$t('uploaded')}</p>
+        <p class="text-sm">
+          {uploadDateTime.toLocaleString(
+            {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            },
+            { locale: $locale },
+          )}
+        </p>
       </div>
     </div>
 

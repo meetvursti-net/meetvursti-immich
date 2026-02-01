@@ -5,7 +5,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { LockableProperty, Stack } from 'src/database';
 import { Chunked, ChunkedArray, DummyValue, GenerateSql } from 'src/decorators';
 import { AuthDto } from 'src/dtos/auth.dto';
-import { AssetFileType, AssetOrder, AssetStatus, AssetType, AssetVisibility } from 'src/enum';
+import { AssetFileType, AssetOrder, AssetSortBy, AssetStatus, AssetType, AssetVisibility } from 'src/enum';
 import { DB } from 'src/schema';
 import { AssetExifTable } from 'src/schema/tables/asset-exif.table';
 import { AssetFileTable } from 'src/schema/tables/asset-file.table';
@@ -67,6 +67,7 @@ interface AssetBuilderOptions {
 
 export interface TimeBucketOptions extends AssetBuilderOptions {
   order?: AssetOrder;
+  sortBy?: AssetSortBy;
 }
 
 export interface TimeBucketItem {
@@ -650,7 +651,7 @@ export class AssetRepository {
       .with('asset', (qb) =>
         qb
           .selectFrom('asset')
-          .select(truncatedDate<Date>().as('timeBucket'))
+          .select(truncatedDate<Date>(options.sortBy).as('timeBucket'))
           .$if(!!options.isTrashed, (qb) => qb.where('asset.status', '!=', AssetStatus.Deleted))
           .where('asset.deletedAt', options.isTrashed ? 'is not' : 'is', null)
           .$if(options.visibility === undefined, withDefaultVisibility)
@@ -688,6 +689,7 @@ export class AssetRepository {
     params: [DummyValue.TIME_BUCKET, { withStacked: true }, { user: { id: DummyValue.UUID } }],
   })
   getTimeBucket(timeBucket: string, options: TimeBucketOptions, auth: AuthDto) {
+    const useUploadDate = options.sortBy === AssetSortBy.DateUploaded;
     const query = this.db
       .with('cte', (qb) =>
         qb
@@ -701,12 +703,18 @@ export class AssetRepository {
             sql`asset.type = 'IMAGE'`.as('isImage'),
             sql`asset."deletedAt" is not null`.as('isTrashed'),
             'asset.livePhotoVideoId',
-            sql`extract(epoch from (asset."localDateTime" AT TIME ZONE 'UTC' - asset."fileCreatedAt" at time zone 'UTC'))::real / 3600`.as(
-              'localOffsetHours',
-            ),
+            // When sorting by upload date, use createdAt for localOffsetHours calculation
+            useUploadDate
+              ? sql`0::real`.as('localOffsetHours')
+              : sql`extract(epoch from (asset."localDateTime" AT TIME ZONE 'UTC' - asset."fileCreatedAt" at time zone 'UTC'))::real / 3600`.as(
+                  'localOffsetHours',
+                ),
             'asset.ownerId',
             'asset.status',
-            sql`asset."fileCreatedAt" at time zone 'utc'`.as('fileCreatedAt'),
+            // When sorting by upload date, return createdAt as the date field
+            useUploadDate
+              ? sql`asset."createdAt" at time zone 'utc'`.as('fileCreatedAt')
+              : sql`asset."fileCreatedAt" at time zone 'utc'`.as('fileCreatedAt'),
             eb.fn('encode', ['asset.thumbhash', sql.lit('base64')]).as('thumbhash'),
             'asset_exif.city',
             'asset_exif.country',
@@ -727,7 +735,7 @@ export class AssetRepository {
           .where('asset.deletedAt', options.isTrashed ? 'is not' : 'is', null)
           .$if(options.visibility == undefined, withDefaultVisibility)
           .$if(!!options.visibility, (qb) => qb.where('asset.visibility', '=', options.visibility!))
-          .where(truncatedDate(), '=', timeBucket.replace(/^[+-]/, ''))
+          .where(truncatedDate(options.sortBy), '=', timeBucket.replace(/^[+-]/, ''))
           .$if(!!options.albumId, (qb) =>
             qb.where((eb) =>
               eb.exists(
@@ -773,7 +781,10 @@ export class AssetRepository {
           )
           .$if(!!options.isTrashed, (qb) => qb.where('asset.status', '!=', AssetStatus.Deleted))
           .$if(!!options.tagId, (qb) => withTagId(qb, options.tagId!))
-          .orderBy('asset.fileCreatedAt', options.order ?? 'desc'),
+          .orderBy(
+            options.sortBy === AssetSortBy.DateUploaded ? 'asset.createdAt' : 'asset.fileCreatedAt',
+            options.order ?? 'desc',
+          ),
       )
       .with('agg', (qb) =>
         qb

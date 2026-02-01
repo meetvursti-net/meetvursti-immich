@@ -19,6 +19,7 @@
   import StackAction from '$lib/components/timeline/actions/StackAction.svelte';
   import TagAction from '$lib/components/timeline/actions/TagAction.svelte';
   import AssetSelectControlBar from '$lib/components/timeline/AssetSelectControlBar.svelte';
+  import SortDropdown from '$lib/components/timeline/sort-dropdown.svelte';
   import Timeline from '$lib/components/timeline/Timeline.svelte';
   import { AssetAction } from '$lib/constants';
   import { TimelineManager } from '$lib/managers/timeline-manager/timeline-manager.svelte';
@@ -27,6 +28,7 @@
   import { assetViewingStore } from '$lib/stores/asset-viewing.store';
   import { isFaceEditMode } from '$lib/stores/face-edit.svelte';
   import { memoryStore } from '$lib/stores/memory.store.svelte';
+  import { timelineSortBy } from '$lib/stores/preferences.store';
   import { preferences, user } from '$lib/stores/user.store';
   import { getAssetThumbnailUrl, memoryLaneTitle } from '$lib/utils';
   import {
@@ -38,14 +40,15 @@
   import { openFileUploadDialog } from '$lib/utils/file-uploader';
   import { getAltText } from '$lib/utils/thumbnail-util';
   import { toTimelineAsset } from '$lib/utils/timeline-util';
-  import { AssetVisibility } from '@immich/sdk';
+  import { AssetSortBy, AssetVisibility } from '@immich/sdk';
   import { ImageCarousel } from '@immich/ui';
   import { mdiDotsVertical, mdiPlus } from '@mdi/js';
   import { t } from 'svelte-i18n';
 
   let { isViewing: showAssetViewer } = assetViewingStore;
   let timelineManager = $state<TimelineManager>() as TimelineManager;
-  const options = { visibility: AssetVisibility.Timeline, withStacked: true, withPartners: true };
+  let sortBy = $derived($timelineSortBy === 'dateUploaded' ? AssetSortBy.DateUploaded : AssetSortBy.DateTaken);
+  let options = $derived({ visibility: AssetVisibility.Timeline, withStacked: true, withPartners: true, sortBy });
 
   const assetInteraction = new AssetInteraction();
 
@@ -101,9 +104,16 @@
       src: getAssetThumbnailUrl(memory.assets[0].id),
     })),
   );
+
+  const handleSortChange = (newSortBy: AssetSortBy) => {
+    $timelineSortBy = newSortBy;
+  };
 </script>
 
 <UserPageLayout hideNavbar={assetInteraction.selectionActive} scrollbar={false}>
+  <div class="flex justify-start px-2 pt-2">
+    <SortDropdown {sortBy} onSelect={handleSortChange} />
+  </div>
   <Timeline
     enableRouting={true}
     bind:timelineManager

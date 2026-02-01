@@ -4999,7 +4999,7 @@ export function tagAssets({ id, bulkIdsDto }: {
 /**
  * Get time bucket
  */
-export function getTimeBucket({ albumId, isFavorite, isTrashed, key, order, personId, slug, tagId, timeBucket, userId, visibility, withCoordinates, withPartners, withStacked }: {
+export function getTimeBucket({ albumId, isFavorite, isTrashed, key, order, personId, slug, sortBy, tagId, timeBucket, userId, visibility, withCoordinates, withPartners, withStacked }: {
     albumId?: string;
     isFavorite?: boolean;
     isTrashed?: boolean;
@@ -5007,6 +5007,7 @@ export function getTimeBucket({ albumId, isFavorite, isTrashed, key, order, pers
     order?: AssetOrder;
     personId?: string;
     slug?: string;
+    sortBy?: AssetSortBy;
     tagId?: string;
     timeBucket: string;
     userId?: string;
@@ -5026,6 +5027,7 @@ export function getTimeBucket({ albumId, isFavorite, isTrashed, key, order, pers
         order,
         personId,
         slug,
+        sortBy,
         tagId,
         timeBucket,
         userId,
@@ -5040,7 +5042,7 @@ export function getTimeBucket({ albumId, isFavorite, isTrashed, key, order, pers
 /**
  * Get time buckets
  */
-export function getTimeBuckets({ albumId, isFavorite, isTrashed, key, order, personId, slug, tagId, userId, visibility, withCoordinates, withPartners, withStacked }: {
+export function getTimeBuckets({ albumId, isFavorite, isTrashed, key, order, personId, slug, sortBy, tagId, userId, visibility, withCoordinates, withPartners, withStacked }: {
     albumId?: string;
     isFavorite?: boolean;
     isTrashed?: boolean;
@@ -5048,6 +5050,7 @@ export function getTimeBuckets({ albumId, isFavorite, isTrashed, key, order, per
     order?: AssetOrder;
     personId?: string;
     slug?: string;
+    sortBy?: AssetSortBy;
     tagId?: string;
     userId?: string;
     visibility?: AssetVisibility;
@@ -5066,6 +5069,7 @@ export function getTimeBuckets({ albumId, isFavorite, isTrashed, key, order, per
         order,
         personId,
         slug,
+        sortBy,
         tagId,
         userId,
         visibility,
@@ -5940,4 +5944,8 @@ export enum LogLevel {
 export enum OAuthTokenEndpointAuthMethod {
     ClientSecretPost = "client_secret_post",
     ClientSecretBasic = "client_secret_basic"
+}
+export enum AssetSortBy {
+    DateTaken = "dateTaken",
+    DateUploaded = "dateUploaded"
 }

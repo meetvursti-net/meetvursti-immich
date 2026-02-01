@@ -57,6 +57,11 @@ export enum AssetOrder {
   Desc = 'desc',
 }
 
+export enum AssetSortBy {
+  DateTaken = 'dateTaken',
+  DateUploaded = 'dateUploaded',
+}
+
 export enum DatabaseAction {
   Create = 'CREATE',
   Update = 'UPDATE',

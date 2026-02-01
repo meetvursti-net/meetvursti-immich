@@ -13341,6 +13341,15 @@
             }
           },
           {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by (dateTaken for when photo was taken, dateUploaded for when it was uploaded)",
+            "schema": {
+              "$ref": "#/components/schemas/AssetSortBy"
+            }
+          },
+          {
             "name": "tagId",
             "required": false,
             "in": "query",
@@ -13514,6 +13523,15 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by (dateTaken for when photo was taken, dateUploaded for when it was uploaded)",
+            "schema": {
+              "$ref": "#/components/schemas/AssetSortBy"
             }
           },
           {
@@ -16762,6 +16780,13 @@
           "width"
         ],
         "type": "object"
+      },
+      "AssetSortBy": {
+        "enum": [
+          "dateTaken",
+          "dateUploaded"
+        ],
+        "type": "string"
       },
       "AssetStackResponseDto": {
         "properties": {

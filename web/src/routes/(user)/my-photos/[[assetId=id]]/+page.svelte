@@ -18,11 +18,13 @@
   import StackAction from '$lib/components/timeline/actions/StackAction.svelte';
   import TagAction from '$lib/components/timeline/actions/TagAction.svelte';
   import AssetSelectControlBar from '$lib/components/timeline/AssetSelectControlBar.svelte';
+  import SortDropdown from '$lib/components/timeline/sort-dropdown.svelte';
   import Timeline from '$lib/components/timeline/Timeline.svelte';
   import { AssetAction } from '$lib/constants';
   import { TimelineManager } from '$lib/managers/timeline-manager/timeline-manager.svelte';
   import { AssetInteraction } from '$lib/stores/asset-interaction.svelte';
   import { assetViewingStore } from '$lib/stores/asset-viewing.store';
+  import { timelineSortBy } from '$lib/stores/preferences.store';
   import { user } from '$lib/stores/user.store';
   import {
     updateStackedAssetInTimeline,
@@ -31,12 +33,13 @@
     type OnUnlink,
   } from '$lib/utils/actions';
   import { openFileUploadDialog } from '$lib/utils/file-uploader';
-  import { AssetVisibility } from '@immich/sdk';
+  import { AssetSortBy, AssetVisibility } from '@immich/sdk';
   import { mdiDotsVertical, mdiPlus } from '@mdi/js';
   import { t } from 'svelte-i18n';
 
   let { isViewing: showAssetViewer } = assetViewingStore;
   let timelineManager = $state<TimelineManager>() as TimelineManager;
+  let sortBy = $derived($timelineSortBy === 'dateUploaded' ? AssetSortBy.DateUploaded : AssetSortBy.DateTaken);
 
   // Only show the current user's photos (no partners)
   const options = $derived({
@@ -44,6 +47,7 @@
     visibility: AssetVisibility.Timeline,
     withStacked: true,
     withPartners: false,
+    sortBy,
   });
 
   const assetInteraction = new AssetInteraction();
@@ -84,9 +88,16 @@
     timelineManager.removeAssets(assetIds);
     assetInteraction.clearMultiselect();
   };
+
+  const handleSortChange = (newSortBy: AssetSortBy) => {
+    $timelineSortBy = newSortBy;
+  };
 </script>
 
 <UserPageLayout hideNavbar={assetInteraction.selectionActive} scrollbar={false} title={$t('my_photos')}>
+  <div class="flex justify-start px-2 pt-2">
+    <SortDropdown {sortBy} onSelect={handleSortChange} />
+  </div>
   <Timeline
     enableRouting={true}
     bind:timelineManager
