@@ -14,11 +14,13 @@
 
   let searchQuery = $state('');
 
-  let filteredPartners = $derived(
-    searchQuery.trim() === ''
-      ? data.partners
-      : data.partners.filter((partner) => partner.name.toLowerCase().includes(searchQuery.toLowerCase())),
-  );
+  let filteredPartners = $derived.by(() => {
+    const partners =
+      searchQuery.trim() === ''
+        ? data.partners
+        : data.partners.filter((partner) => partner.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return partners.toSorted((a, b) => a.name.localeCompare(b.name));
+  });
 </script>
 
 <UserPageLayout title={data.meta.title}>
@@ -30,10 +32,12 @@
     {#each filteredPartners as partner (partner.id)}
       <a
         href={Route.viewPartner(partner)}
-        class="flex flex-col items-center gap-3 rounded-xl p-6 transition-all hover:bg-gray-200 dark:hover:bg-gray-700 bg-slate-50 dark:bg-gray-900"
+        class="flex flex-row items-center gap-3 rounded-xl p-4 transition-all hover:bg-gray-200 dark:hover:bg-gray-700 bg-slate-50 dark:bg-gray-900 overflow-hidden"
       >
-        <UserAvatar user={partner} size="xl" />
-        <p class="text-immich-fg dark:text-immich-dark-fg font-medium text-center">
+        <div class="shrink-0">
+          <UserAvatar user={partner} size="lg" />
+        </div>
+        <p class="text-immich-fg dark:text-immich-dark-fg font-medium truncate">
           {partner.name}
         </p>
       </a>
