@@ -41,20 +41,8 @@
 
   <NavbarItem title={$t('my_photos')} href={Route.myPhotos()} icon={mdiAccountOutline} activeIcon={mdiAccount} />
 
-  {#if featureFlagsManager.value.search}
-    <NavbarItem title={$t('explore')} href={Route.explore()} icon={mdiMagnify} />
-  {/if}
-
-  {#if featureFlagsManager.value.map}
-    <NavbarItem title={$t('map')} href={Route.map()} icon={mdiMapOutline} activeIcon={mdiMap} />
-  {/if}
-
   {#if $preferences.people.enabled && $preferences.people.sidebarWeb}
     <NavbarItem title={$t('people')} href={Route.people()} icon={mdiAccountOutline} activeIcon={mdiAccount} />
-  {/if}
-
-  {#if $preferences.sharedLinks.enabled && $preferences.sharedLinks.sidebarWeb}
-    <NavbarItem title={$t('shared_links')} href={Route.sharedLinks()} icon={mdiLink} />
   {/if}
 
   <NavbarItem
@@ -64,9 +52,19 @@
     activeIcon={mdiAccountMultiple}
   />
 
-  <NavbarGroup title={$t('library')} size="tiny" />
+  {#if $preferences.sharedLinks.enabled && $preferences.sharedLinks.sidebarWeb}
+    <NavbarItem title={$t('shared_links')} href={Route.sharedLinks()} icon={mdiLink} />
+  {/if}
 
-  <NavbarItem title={$t('favorites')} href={Route.favorites()} icon={mdiHeartOutline} activeIcon={mdiHeart} />
+  {#if featureFlagsManager.value.map}
+    <NavbarItem title={$t('map')} href={Route.map()} icon={mdiMapOutline} activeIcon={mdiMap} />
+  {/if}
+
+  {#if featureFlagsManager.value.search}
+    <NavbarItem title={$t('explore')} href={Route.explore()} icon={mdiMagnify} />
+  {/if}
+
+  <NavbarGroup title={$t('library')} size="tiny" />
 
   <NavbarItem
     title={$t('albums')}
@@ -81,15 +79,11 @@
     {/snippet}
   </NavbarItem>
 
+  <NavbarItem title={$t('favorites')} href={Route.favorites()} icon={mdiHeartOutline} activeIcon={mdiHeart} />
+
   {#if $preferences.tags.enabled && $preferences.tags.sidebarWeb}
     <NavbarItem title={$t('tags')} href={Route.tags()} icon={{ icon: mdiTagMultipleOutline, flipped: true }} />
   {/if}
-
-  {#if $preferences.folders.enabled && $preferences.folders.sidebarWeb}
-    <NavbarItem title={$t('folders')} href={Route.folders()} icon={{ icon: mdiFolderOutline, flipped: true }} />
-  {/if}
-
-  <NavbarItem title={$t('utilities')} href={Route.utilities()} icon={mdiToolboxOutline} activeIcon={mdiToolbox} />
 
   <NavbarItem
     title={$t('archive')}
@@ -97,6 +91,12 @@
     icon={mdiArchiveArrowDownOutline}
     activeIcon={mdiArchiveArrowDown}
   />
+
+  {#if $preferences.folders.enabled && $preferences.folders.sidebarWeb}
+    <NavbarItem title={$t('folders')} href={Route.folders()} icon={{ icon: mdiFolderOutline, flipped: true }} />
+  {/if}
+
+  <NavbarItem title={$t('utilities')} href={Route.utilities()} icon={mdiToolboxOutline} activeIcon={mdiToolbox} />
 
   <NavbarItem title={$t('locked_folder')} href={Route.locked()} icon={mdiLockOutline} activeIcon={mdiLock} />
 
