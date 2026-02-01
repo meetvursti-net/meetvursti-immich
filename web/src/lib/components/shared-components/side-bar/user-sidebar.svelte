@@ -58,7 +58,7 @@
   {/if}
 
   <NavbarItem
-    title={$t('sharing')}
+    title={$t('users')}
     href={Route.sharing()}
     icon={mdiAccountMultipleOutline}
     activeIcon={mdiAccountMultiple}
