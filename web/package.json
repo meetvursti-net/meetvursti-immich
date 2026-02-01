@@ -27,7 +27,7 @@
     "@formatjs/icu-messageformat-parser": "^3.0.0",
     "@immich/justified-layout-wasm": "^0.4.3",
     "@immich/sdk": "file:../open-api/typescript-sdk",
-    "@immich/ui": "github:meetvursti-net/meetvursti-immich-ui#0241e1967c0aa797d714dbcbbd7bdf1827f3b17f",
+    "@immich/ui": "https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz",
     "@mapbox/mapbox-gl-rtl-text": "0.2.3",
     "@mdi/js": "^7.4.47",
     "@photo-sphere-viewer/core": "^5.14.0",

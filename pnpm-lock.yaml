@@ -8,7 +8,7 @@ settings:
 overrides:
   canvas: 2.11.2
   sharp: ^0.34.5
-  '@immich/ui': github:meetvursti-net/meetvursti-immich-ui#0241e1967c0aa797d714dbcbbd7bdf1827f3b17f
+  '@immich/ui': https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz
 
 packageExtensionsChecksum: sha256-2mmiAjyELwi3ba7JuR9e+5VJC1/I9yWQB8lQzWn1FsY=
 
@@ -742,8 +742,8 @@ importers:
         specifier: file:../open-api/typescript-sdk
         version: link:../open-api/typescript-sdk
       '@immich/ui':
-        specifier: github:meetvursti-net/meetvursti-immich-ui#0241e1967c0aa797d714dbcbbd7bdf1827f3b17f
-        version: '@meetvursti-net/immich-ui@https://codeload.github.com/meetvursti-net/meetvursti-immich-ui/tar.gz/0241e1967c0aa797d714dbcbbd7bdf1827f3b17f(@sveltejs/kit@2.49.5(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.46.4)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(tailwindcss@4.1.18)'
+        specifier: https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz
+        version: '@meetvursti-net/immich-ui@https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz(@sveltejs/kit@2.49.5(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.46.4)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(tailwindcss@4.1.18)'
       '@mapbox/mapbox-gl-rtl-text':
         specifier: 0.2.3
         version: 0.2.3(mapbox-gl@1.13.3)
@@ -3624,8 +3624,8 @@ packages:
       '@types/react': '>=16'
       react: '>=16'
 
-  '@meetvursti-net/immich-ui@https://codeload.github.com/meetvursti-net/meetvursti-immich-ui/tar.gz/0241e1967c0aa797d714dbcbbd7bdf1827f3b17f':
-    resolution: {tarball: https://codeload.github.com/meetvursti-net/meetvursti-immich-ui/tar.gz/0241e1967c0aa797d714dbcbbd7bdf1827f3b17f}
+  '@meetvursti-net/immich-ui@https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz':
+    resolution: {integrity: sha512-CLWQyI1vlxaic5oymZXpWOaXRH4OCRQC5mf7iNHH9ty7/w3ySD+epl2KNpEazERJhwTuE3gjjEOjeBNQLawnyA==, tarball: https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz}
     version: 0.61.1
     peerDependencies:
       svelte: ^5.0.0
@@ -16304,7 +16304,7 @@ snapshots:
       '@types/react': 19.2.8
       react: 18.3.1
 
-  '@meetvursti-net/immich-ui@https://codeload.github.com/meetvursti-net/meetvursti-immich-ui/tar.gz/0241e1967c0aa797d714dbcbbd7bdf1827f3b17f(@sveltejs/kit@2.49.5(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.46.4)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(tailwindcss@4.1.18)':
+  '@meetvursti-net/immich-ui@https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz(@sveltejs/kit@2.49.5(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.46.4)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.46.4)(tailwindcss@4.1.18)':
     dependencies:
       '@immich/svelte-markdown-preprocess': 0.2.1(svelte@5.46.4)
       '@internationalized/date': 3.10.0

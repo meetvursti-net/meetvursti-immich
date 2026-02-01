@@ -32,7 +32,7 @@ onlyBuiltDependencies:
 overrides:
   canvas: 2.11.2
   sharp: ^0.34.5
-  '@immich/ui': github:meetvursti-net/meetvursti-immich-ui#0241e1967c0aa797d714dbcbbd7bdf1827f3b17f
+  '@immich/ui': https://raw.githubusercontent.com/meetvursti-net/meetvursti-immich-ui/b5752d2688eebc9a5dbaf7e69561b746aa973cf0/immich-ui.tgz
 packageExtensions:
   nestjs-kysely:
     dependencies:
