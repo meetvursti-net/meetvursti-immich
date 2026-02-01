@@ -110,10 +110,12 @@
   };
 </script>
 
-<UserPageLayout hideNavbar={assetInteraction.selectionActive} scrollbar={false}>
-  <div class="flex justify-start px-2 pt-2">
-    <SortDropdown {sortBy} onSelect={handleSortChange} />
-  </div>
+<UserPageLayout hideNavbar={assetInteraction.selectionActive} scrollbar={false} title={$t('photos')}>
+  {#snippet buttons()}
+    <div class="flex place-items-center gap-2">
+      <SortDropdown {sortBy} onSelect={handleSortChange} />
+    </div>
+  {/snippet}
   <Timeline
     enableRouting={true}
     bind:timelineManager

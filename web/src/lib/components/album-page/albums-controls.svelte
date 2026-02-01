@@ -148,6 +148,7 @@
     title: albumSortByNames[id],
     icon: sortIcon,
   })}
+  position="bottom-right"
 />
 
 <!-- Group Albums -->
@@ -161,6 +162,7 @@
     icon: groupIcon,
     disabled: isDisabled(),
   })}
+  position="bottom-right"
 />
 
 {#if getSelectedAlbumGroupOption($albumViewSettings) !== AlbumGroupBy.None}

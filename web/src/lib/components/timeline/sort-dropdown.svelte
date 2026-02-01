@@ -44,4 +44,6 @@
   onSelect={handleSelect}
   render={renderSortOption}
   title={$t('sort_by')}
+  hideTextOnSmallScreen={false}
+  position="bottom-right"
 />
