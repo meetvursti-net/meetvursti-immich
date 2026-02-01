@@ -35,7 +35,7 @@
 
 <svelte:document use:shortcut={{ shortcut: { key: 't' }, onShortcut: handleAddTag }} />
 
-{#if isOwner && !authManager.isSharedLink}
+{#if !authManager.isSharedLink}
   <section class="px-4 mt-4">
     <div class="flex h-10 w-full items-center justify-between text-sm">
       <Text color="muted">{$t('tags')}</Text>

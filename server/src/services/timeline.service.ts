@@ -28,6 +28,11 @@ export class TimelineService extends BaseService {
   private async buildTimeBucketOptions(auth: AuthDto, dto: TimeBucketDto): Promise<TimeBucketOptions> {
     const { userId, ...options } = dto;
 
+    // When viewing by tagId, don't filter by userIds - tags are shared
+    if (dto.tagId) {
+      return { ...options, userIds: undefined };
+    }
+
     // Always include partners when viewing a specific person's photos
     // This allows users to see assets from all partners that contain the person
     const partnerIds = await getMyPartnerIds({
@@ -57,7 +62,8 @@ export class TimelineService extends BaseService {
 
     if (dto.albumId) {
       await this.requireAccess({ auth, permission: Permission.AlbumRead, ids: [dto.albumId] });
-    } else {
+    } else if (!dto.tagId) {
+      // Don't set userId when viewing by tagId - tags are shared across all users
       dto.userId = dto.userId || auth.user.id;
     }
 

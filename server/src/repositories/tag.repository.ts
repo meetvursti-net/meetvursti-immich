@@ -24,17 +24,25 @@ export class TagRepository {
 
   @GenerateSql({ params: [DummyValue.UUID, DummyValue.STRING] })
   getByValue(userId: string, value: string) {
-    return this.db
-      .selectFrom('tag')
-      .select(columns.tag)
-      .where('userId', '=', userId)
-      .where('value', '=', value)
-      .executeTakeFirst();
+    // Check for tag value globally, not per-user
+    return this.db.selectFrom('tag').select(columns.tag).where('value', '=', value).executeTakeFirst();
   }
 
   @GenerateSql({ params: [{ userId: DummyValue.UUID, value: DummyValue.STRING, parentId: DummyValue.UUID }] })
   async upsertValue({ userId, value, parentId: _parentId }: { userId: string; value: string; parentId?: string }) {
     const parentId = _parentId ?? null;
+
+    // First check if tag already exists globally
+    const existingTag = await this.db
+      .selectFrom('tag')
+      .select(columns.tag)
+      .where('value', '=', value)
+      .executeTakeFirst();
+
+    if (existingTag) {
+      return existingTag;
+    }
+
     return this.db.transaction().execute(async (tx) => {
       const tag = await this.db
         .insertInto('tag')
@@ -70,7 +78,8 @@ export class TagRepository {
 
   @GenerateSql({ params: [DummyValue.UUID] })
   getAll(userId: string) {
-    return this.db.selectFrom('tag').select(columns.tag).where('userId', '=', userId).orderBy('value').execute();
+    // Return all tags accessible by all users
+    return this.db.selectFrom('tag').select(columns.tag).orderBy('value').execute();
   }
 
   @GenerateSql({ params: [{ userId: DummyValue.UUID, color: DummyValue.STRING, value: DummyValue.STRING }] })

@@ -43,9 +43,10 @@ export class TagService extends BaseService {
 
     const userId = auth.user.id;
     const value = parent ? `${parent.value}/${dto.name}` : dto.name;
-    const duplicate = await this.tagRepository.getByValue(userId, value);
-    if (duplicate) {
-      throw new BadRequestException(`A tag with that name already exists`);
+    const existing = await this.tagRepository.getByValue(userId, value);
+    if (existing) {
+      // Return the existing tag instead of throwing an error (shared tags)
+      return mapTag(existing);
     }
 
     const { color } = dto;
@@ -78,7 +79,8 @@ export class TagService extends BaseService {
   async bulkTagAssets(auth: AuthDto, dto: TagBulkAssetsDto): Promise<TagBulkAssetsResponseDto> {
     const [tagIds, assetIds] = await Promise.all([
       this.checkAccess({ auth, permission: Permission.TagAsset, ids: dto.tagIds }),
-      this.checkAccess({ auth, permission: Permission.AssetUpdate, ids: dto.assetIds }),
+      // Use AssetRead instead of AssetUpdate to allow all users to tag any visible asset
+      this.checkAccess({ auth, permission: Permission.AssetRead, ids: dto.assetIds }),
     ]);
 
     const items: Insertable<TagAssetTable>[] = [];
