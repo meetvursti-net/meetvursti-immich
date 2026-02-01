@@ -149,6 +149,8 @@
               icon={mdiClose}
               size="small"
               aria-label={$t('stop_sharing_photos_with_user')}
+              disabled
+              class="opacity-50 cursor-not-allowed"
             />
           {/if}
         </div>
@@ -182,12 +184,14 @@
               {$t('shared_from_partner', { values: { partner: partner.user.name } })}
             </Text>
 
-            <SettingSwitch
-              title={$t('show_in_timeline')}
-              subtitle={$t('show_in_timeline_setting_description')}
-              bind:checked={partner.inTimeline}
-              onToggle={(isChecked) => handleShowOnTimelineChanged(partner, isChecked)}
-            />
+            <div class="opacity-50 pointer-events-none">
+              <SettingSwitch
+                title={$t('show_in_timeline')}
+                subtitle={$t('show_in_timeline_setting_description')}
+                checked={partner.inTimeline}
+                disabled
+              />
+            </div>
           {/if}
         </div>
       </div>
@@ -195,6 +199,12 @@
   {/if}
 
   <div class="flex justify-end mt-5">
-    <Button shape="round" size="small" onclick={() => handleCreatePartners()}>{$t('add_partner')}</Button>
+    <Button
+      shape="round"
+      size="small"
+      onclick={() => handleCreatePartners()}
+      disabled
+      class="opacity-50 cursor-not-allowed">{$t('add_partner')}</Button
+    >
   </div>
 </section>

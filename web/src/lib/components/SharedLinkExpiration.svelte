@@ -25,7 +25,6 @@
 
   const relativeTime = $derived(new Intl.RelativeTimeFormat($locale));
   const expiredDateOptions = $derived([
-    { text: $t('never'), value: 0 },
     ...expirationOptions
       .map(([value, unit]) => ({
         text: relativeTime.format(value, unit),
