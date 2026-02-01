@@ -30,7 +30,6 @@ export default defineConfig({
       // eslint-disable-next-line unicorn/prefer-module
       '@test-data': path.resolve(__dirname, './src/test-data'),
       // '@immich/ui': path.resolve(__dirname, '../../ui'),
-      '@immich/ui': './node_modules/@meetvursti-net/immich-ui',
     },
   },
   server: {
