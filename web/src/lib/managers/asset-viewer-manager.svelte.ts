@@ -1,6 +1,28 @@
-import { PersistedLocalStorage } from '$lib/utils/persisted';
+import { browser } from '$app/environment';
 
-const isShowDetailPanel = new PersistedLocalStorage<boolean>('asset-viewer-state', false);
+// Session-only state for detail panel - defaults to true on desktop
+const getInitialDetailPanelState = () => {
+  if (!browser) {
+    return true;
+  }
+  // Check if it's a desktop device (not a touch device and wide enough)
+  const isDesktop = !window.matchMedia('(pointer: coarse)').matches && window.innerWidth >= 768;
+  return isDesktop;
+};
+
+class DetailPanelState {
+  #value = $state(getInitialDetailPanelState());
+
+  get current() {
+    return this.#value;
+  }
+
+  set current(value: boolean) {
+    this.#value = value;
+  }
+}
+
+const isShowDetailPanel = new DetailPanelState();
 
 export class AssetViewerManager {
   isShowActivityPanel = $state(false);

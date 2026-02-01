@@ -11,8 +11,8 @@ const getDefaultPreferences = (): UserPreferences => {
       defaultAssetOrder: AssetOrder.Desc,
     },
     folders: {
-      enabled: false,
-      sidebarWeb: false,
+      enabled: true,
+      sidebarWeb: true,
     },
     memories: {
       enabled: true,
@@ -20,18 +20,18 @@ const getDefaultPreferences = (): UserPreferences => {
     },
     people: {
       enabled: true,
-      sidebarWeb: false,
+      sidebarWeb: true,
     },
     sharedLinks: {
       enabled: true,
-      sidebarWeb: false,
+      sidebarWeb: true,
     },
     ratings: {
       enabled: false,
     },
     tags: {
-      enabled: false,
-      sidebarWeb: false,
+      enabled: true,
+      sidebarWeb: true,
     },
     emailNotifications: {
       enabled: true,
@@ -40,7 +40,7 @@ const getDefaultPreferences = (): UserPreferences => {
     },
     download: {
       archiveSize: HumanReadableSize.GiB * 4,
-      includeEmbeddedVideos: false,
+      includeEmbeddedVideos: true,
     },
     purchase: {
       showSupportBadge: true,

@@ -9,9 +9,9 @@ export interface ThemeSetting {
 }
 
 // Locale to use for formatting dates, numbers, etc.
-export const locale = persisted<string | undefined>('locale', 'default', {
+export const locale = persisted<string | undefined>('locale', 'fi-FI', {
   serializer: {
-    parse: (text) => text || 'default',
+    parse: (text) => (text && text !== 'default' ? text : 'fi-FI'),
     stringify: (object) => object ?? '',
   },
 });
@@ -138,7 +138,7 @@ export const placesViewSettings = persisted<PlacesViewSettings>('places-view-set
 
 export const showDeleteModal = persisted<boolean>('delete-confirm-dialog', true, {});
 
-export const alwaysLoadOriginalFile = persisted<boolean>('always-load-original-file', false, {});
+export const alwaysLoadOriginalFile = persisted<boolean>('always-load-original-file', true, {});
 
 export const playVideoThumbnailOnHover = persisted<boolean>('play-video-thumbnail-on-hover', true, {});
 

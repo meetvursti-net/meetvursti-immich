@@ -111,12 +111,14 @@
         <SettingAccordion key="people" title={$t('people')} subtitle={$t('people_feature_description')}>
           <div class="ms-4 mt-6 flex flex-col gap-4">
             <Field label={$t('enable')}>
-              <Switch bind:checked={peopleEnabled} />
+              <span class="text-red-500 text-sm me-2">{$t('force_enabled_by_admins')}</span>
+              <Switch bind:checked={peopleEnabled} disabled />
             </Field>
 
             {#if peopleEnabled}
               <Field label={$t('sidebar')} description={$t('sidebar_display_description')}>
-                <Switch bind:checked={peopleSidebar} />
+                <span class="text-red-500 text-sm me-2">{$t('force_enabled_by_admins')}</span>
+                <Switch bind:checked={peopleSidebar} disabled />
               </Field>
             {/if}
           </div>
@@ -125,7 +127,8 @@
         <SettingAccordion key="rating" title={$t('rating')} subtitle={$t('rating_description')}>
           <div class="ms-4 mt-6 flex flex-col gap-4">
             <Field label={$t('enable')}>
-              <Switch bind:checked={ratingsEnabled} />
+              <span class="text-red-500 text-sm me-2">{$t('force_disabled_by_admins')}</span>
+              <Switch bind:checked={ratingsEnabled} disabled />
             </Field>
           </div>
         </SettingAccordion>
@@ -133,12 +136,14 @@
         <SettingAccordion key="shared-links" title={$t('shared_links')} subtitle={$t('shared_links_description')}>
           <div class="ms-4 mt-6 flex flex-col gap-4">
             <Field label={$t('enable')}>
-              <Switch bind:checked={sharedLinksEnabled} />
+              <span class="text-red-500 text-sm me-2">{$t('force_enabled_by_admins')}</span>
+              <Switch bind:checked={sharedLinksEnabled} disabled />
             </Field>
 
             {#if sharedLinksEnabled}
               <Field label={$t('sidebar')} description={$t('sidebar_display_description')}>
-                <Switch bind:checked={sharedLinkSidebar} />
+                <span class="text-red-500 text-sm me-2">{$t('force_enabled_by_admins')}</span>
+                <Switch bind:checked={sharedLinkSidebar} disabled />
               </Field>
             {/if}
           </div>
@@ -147,12 +152,14 @@
         <SettingAccordion key="tags" title={$t('tags')} subtitle={$t('tag_feature_description')}>
           <div class="ms-4 mt-6 flex flex-col gap-4">
             <Field label={$t('enable')}>
-              <Switch bind:checked={tagsEnabled} />
+              <span class="text-red-500 text-sm me-2">{$t('force_enabled_by_admins')}</span>
+              <Switch bind:checked={tagsEnabled} disabled />
             </Field>
 
             {#if tagsEnabled}
               <Field label={$t('sidebar')} description={$t('sidebar_display_description')}>
-                <Switch bind:checked={tagsSidebar} />
+                <span class="text-red-500 text-sm me-2">{$t('force_enabled_by_admins')}</span>
+                <Switch bind:checked={tagsSidebar} disabled />
               </Field>
             {/if}
           </div>
@@ -161,7 +168,8 @@
         <SettingAccordion key="cast" title={$t('cast')} subtitle={$t('cast_description')}>
           <div class="ms-4 mt-6 flex flex-col gap-4">
             <Field label={$t('gcast_enabled')} description={$t('gcast_enabled_description')}>
-              <Switch bind:checked={gCastEnabled} />
+              <span class="text-red-500 text-sm me-2">{$t('force_disabled_by_admins')}</span>
+              <Switch bind:checked={gCastEnabled} disabled />
             </Field>
           </div>
         </SettingAccordion>

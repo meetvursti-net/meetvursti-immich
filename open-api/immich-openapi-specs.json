@@ -17299,7 +17299,7 @@
             "type": "integer"
           },
           "includeEmbeddedVideos": {
-            "default": false,
+            "default": true,
             "type": "boolean"
           }
         },
@@ -17575,11 +17575,11 @@
       "FoldersResponse": {
         "properties": {
           "enabled": {
-            "default": false,
+            "default": true,
             "type": "boolean"
           },
           "sidebarWeb": {
-            "default": false,
+            "default": true,
             "type": "boolean"
           }
         },
@@ -18834,7 +18834,7 @@
             "type": "boolean"
           },
           "sidebarWeb": {
-            "default": false,
+            "default": true,
             "type": "boolean"
           }
         },
@@ -20963,7 +20963,7 @@
             "type": "boolean"
           },
           "sidebarWeb": {
-            "default": false,
+            "default": true,
             "type": "boolean"
           }
         },

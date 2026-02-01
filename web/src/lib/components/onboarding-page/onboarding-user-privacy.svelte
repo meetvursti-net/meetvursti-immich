@@ -28,5 +28,13 @@
     {$t('onboarding_privacy_description')}
   </p>
 
-  <SettingSwitch title={$t('gcast_enabled')} subtitle={$t('gcast_enabled_description')} bind:checked={gCastEnabled} />
+  <div>
+    <SettingSwitch
+      title={$t('gcast_enabled')}
+      subtitle={$t('gcast_enabled_description')}
+      bind:checked={gCastEnabled}
+      disabled
+    />
+    <span class="text-red-500 text-sm">{$t('force_disabled_by_admins')}</span>
+  </div>
 </div>

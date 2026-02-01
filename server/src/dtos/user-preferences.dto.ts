@@ -178,13 +178,13 @@ class MemoriesResponse {
 }
 
 class FoldersResponse {
-  enabled: boolean = false;
-  sidebarWeb: boolean = false;
+  enabled: boolean = true;
+  sidebarWeb: boolean = true;
 }
 
 class PeopleResponse {
   enabled: boolean = true;
-  sidebarWeb: boolean = false;
+  sidebarWeb: boolean = true;
 }
 
 class TagsResponse {
@@ -194,7 +194,7 @@ class TagsResponse {
 
 class SharedLinksResponse {
   enabled: boolean = true;
-  sidebarWeb: boolean = false;
+  sidebarWeb: boolean = true;
 }
 
 class EmailNotificationsResponse {
@@ -207,7 +207,7 @@ class DownloadResponse {
   @ApiProperty({ type: 'integer' })
   archiveSize!: number;
 
-  includeEmbeddedVideos: boolean = false;
+  includeEmbeddedVideos: boolean = true;
 }
 
 class PurchaseResponse {
