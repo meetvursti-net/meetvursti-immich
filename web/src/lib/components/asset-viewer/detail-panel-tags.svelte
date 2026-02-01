@@ -4,7 +4,7 @@
   import AssetTagModal from '$lib/modals/AssetTagModal.svelte';
   import { Route } from '$lib/route';
   import { removeTag } from '$lib/utils/asset-utils';
-  import { getAssetInfo, type AssetResponseDto } from '@immich/sdk';
+  import { getAssetInfo, type AssetResponseDto, type TagResponseDto } from '@immich/sdk';
   import { Icon, modalManager, Text } from '@immich/ui';
   import { mdiClose, mdiPlus } from '@mdi/js';
   import { t } from 'svelte-i18n';
@@ -14,21 +14,28 @@
     isOwner: boolean;
   }
 
-  let { asset = $bindable(), isOwner }: Props = $props();
+  let { asset, isOwner }: Props = $props();
 
-  let tags = $derived(asset.tags || []);
+  let localTags = $state<TagResponseDto[]>([]);
+
+  // Sync local tags when asset prop changes
+  $effect(() => {
+    localTags = asset.tags || [];
+  });
 
   const handleAddTag = async () => {
     const success = await modalManager.show(AssetTagModal, { assetIds: [asset.id] });
     if (success) {
-      asset = await getAssetInfo({ id: asset.id });
+      const updatedAsset = await getAssetInfo({ id: asset.id });
+      localTags = updatedAsset.tags || [];
     }
   };
 
   const handleRemove = async (tagId: string) => {
     const ids = await removeTag({ tagIds: [tagId], assetIds: [asset.id], showNotification: false });
     if (ids) {
-      asset = await getAssetInfo({ id: asset.id });
+      const updatedAsset = await getAssetInfo({ id: asset.id });
+      localTags = updatedAsset.tags || [];
     }
   };
 </script>
@@ -36,12 +43,12 @@
 <svelte:document use:shortcut={{ shortcut: { key: 't' }, onShortcut: handleAddTag }} />
 
 {#if !authManager.isSharedLink}
-  <section class="px-4 mt-4">
-    <div class="flex h-10 w-full items-center justify-between text-sm">
-      <Text color="muted">{$t('tags')}</Text>
+  <section class="px-4 pt-4 text-sm">
+    <div class="flex h-10 w-full items-center justify-between">
+      <Text size="small" color="muted">{$t('tags')}</Text>
     </div>
     <section class="flex flex-wrap pt-2 gap-1" data-testid="detail-panel-tags">
-      {#each tags as tag (tag.id)}
+      {#each localTags as tag (tag.id)}
         <div class="flex group transition-all">
           <a
             class="inline-block h-min whitespace-nowrap ps-3 pe-1 group-hover:ps-3 py-1 text-center align-baseline leading-none text-gray-100 dark:text-immich-dark-gray bg-primary rounded-s-full hover:bg-immich-primary/80 dark:hover:bg-immich-dark-primary/80 transition-all"

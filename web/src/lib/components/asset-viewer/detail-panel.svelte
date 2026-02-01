@@ -170,6 +170,10 @@
     </section>
   {/if}
 
+  {#if $preferences?.tags?.enabled}
+    <DetailPanelTags {asset} {isOwner} />
+  {/if}
+
   {#if !authManager.isSharedLink}
     <section class="px-4 pt-4 text-sm">
       <div class="flex h-10 w-full items-center justify-between">
@@ -564,12 +568,6 @@
         </div>
       </a>
     {/each}
-  </section>
-{/if}
-
-{#if $preferences?.tags?.enabled}
-  <section class="relative px-2 pb-12 dark:bg-immich-dark-bg dark:text-immich-dark-fg">
-    <DetailPanelTags {asset} {isOwner} />
   </section>
 {/if}
 

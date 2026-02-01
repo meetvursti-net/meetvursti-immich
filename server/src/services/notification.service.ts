@@ -169,7 +169,12 @@ export class NotificationService extends BaseService {
       return;
     }
 
-    const [asset] = await this.assetRepository.getByIdsWithAllRelationsButStacks([assetId]);
+    const asset = await this.assetRepository.getById(assetId, {
+      exifInfo: true,
+      owner: true,
+      faces: { person: true },
+      tags: true,
+    });
     if (asset) {
       this.websocketRepository.clientSend(
         'on_asset_update',
