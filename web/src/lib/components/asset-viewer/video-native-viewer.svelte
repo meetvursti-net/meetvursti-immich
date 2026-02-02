@@ -141,7 +141,7 @@
         playsinline
         controls
         disablePictureInPicture
-        class="h-full object-contain"
+        class="h-full object-contain max-md:w-full"
         {...useSwipe(onSwipe)}
         oncanplay={(e) => handleCanPlay(e.currentTarget)}
         onended={onVideoEnded}

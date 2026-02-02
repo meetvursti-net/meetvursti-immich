@@ -231,7 +231,9 @@
             shape="round"
             color="secondary"
             variant="ghost"
-            onclick={() => (isFaceEditMode.value = !isFaceEditMode.value)}
+            onclick={() => {
+              isFaceEditMode.value = !isFaceEditMode.value;
+            }}
           />
 
           {#if people.length > 0 || unassignedFaces.length > 0}

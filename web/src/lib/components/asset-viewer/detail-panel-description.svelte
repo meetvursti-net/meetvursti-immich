@@ -100,11 +100,17 @@
         </div>
       </div>
     {:else}
-      <p class="inline wrap-break-word whitespace-pre-line text-black dark:text-white text-base">
+      <button
+        type="button"
+        class="inline wrap-break-word whitespace-pre-line text-black dark:text-white text-base text-left"
+        onclick={startEditing}
+      >
         {#if currentDescription}
           {currentDescription}
         {:else}
-          <span class="text-gray-500 dark:text-gray-400">{$t('add_a_description')}</span>
+          <span class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"
+            >{$t('add_a_description')}</span
+          >
         {/if}
         <IconButton
           icon={mdiPencil}
@@ -116,7 +122,7 @@
           onclick={startEditing}
           class="inline-flex align-middle ms-1"
         />
-      </p>
+      </button>
     {/if}
   </section>
 {:else if currentDescription}

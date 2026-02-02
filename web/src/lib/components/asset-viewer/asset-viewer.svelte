@@ -16,6 +16,7 @@
   import { preloadManager } from '$lib/managers/PreloadManager.svelte';
   import { Route } from '$lib/route';
   import { assetViewingStore } from '$lib/stores/asset-viewing.store';
+  import { isFaceEditMode } from '$lib/stores/face-edit.svelte';
   import { ocrManager } from '$lib/stores/ocr.svelte';
   import { alwaysLoadOriginalVideo } from '$lib/stores/preferences.store';
   import { SlideshowNavigation, SlideshowState, slideshowStore } from '$lib/stores/slideshow.store';
@@ -116,6 +117,40 @@
   let zoomToggle = $state(() => void 0);
   let playOriginalVideo = $state($alwaysLoadOriginalVideo);
   let isEditingFaces = $state(false);
+  let panelWasOpenBeforeFaceTag = $state(false);
+  let wasInFaceTagMode = $state(false);
+
+  // Check if it's a mobile device
+  const isMobileDevice = () => {
+    return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+  };
+
+  // Handle "Edit People" button state change (pencil icon)
+  const handleEditStateChange = (editing: boolean) => {
+    isEditingFaces = editing;
+  };
+
+  // Watch isFaceEditMode changes to hide/show panel on mobile during face tagging
+  $effect(() => {
+    const isTagging = isFaceEditMode.value;
+    if (isMobileDevice()) {
+      if (isTagging && !wasInFaceTagMode) {
+        // Entering face tag mode - store panel state and close it
+        panelWasOpenBeforeFaceTag = assetViewerManager.isShowDetailPanel;
+        if (assetViewerManager.isShowDetailPanel) {
+          assetViewerManager.closeDetailPanel();
+        }
+        wasInFaceTagMode = true;
+      } else if (!isTagging && wasInFaceTagMode) {
+        // Exiting face tag mode - reopen panel if it was open before
+        if (panelWasOpenBeforeFaceTag) {
+          assetViewerManager.toggleDetailPanel();
+        }
+        panelWasOpenBeforeFaceTag = false;
+        wasInFaceTagMode = false;
+      }
+    }
+  });
 
   // Swipe gesture state for mobile detail panel
   let swipeStartY = $state(0);
@@ -517,7 +552,7 @@
 >
   <!-- Top navigation bar -->
   {#if $slideshowState === SlideshowState.None && !isShowEditor}
-    <div class="col-span-4 col-start-1 row-span-1 row-start-1 transition-transform">
+    <div class="z-20 col-span-4 col-start-1 row-span-1 row-start-1 transition-transform">
       <AssetViewerNavBar
         {asset}
         {album}
@@ -559,7 +594,7 @@
 
   <!-- Asset Viewer -->
   <div
-    class="z-[-1] relative col-start-1 col-span-4 row-start-1 row-span-full transition-all duration-150 {assetViewerManager.isShowDetailPanel
+    class="relative col-start-1 col-span-4 row-start-1 row-span-full transition-all duration-150 {assetViewerManager.isShowDetailPanel
       ? 'max-md:h-1/3 max-md:overflow-hidden'
       : ''}"
   >
@@ -668,7 +703,7 @@
         {asset}
         currentAlbum={album}
         albums={appearsInAlbums}
-        onEditStateChange={(editing) => (isEditingFaces = editing)}
+        onEditStateChange={handleEditStateChange}
         onSwipeStart={handleSwipeStart}
         onSwipeMove={handleSwipeMove}
         onSwipeEnd={handleSwipeEnd}
@@ -679,7 +714,7 @@
   <!-- Swipe-up zone for opening detail panel on mobile -->
   {#if asset.hasMetadata && $slideshowState === SlideshowState.None && !assetViewerManager.isShowDetailPanel && !isShowEditor}
     <div
-      class="md:hidden fixed bottom-0 left-0 right-0 h-12 z-10 flex justify-center items-start pt-1"
+      class="md:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 z-10 flex justify-center items-center rounded-t-lg"
       use:swipe={{
         onSwipeStart: handleBottomSwipeStart,
         onSwipeMove: handleBottomSwipeMove,
