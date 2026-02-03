@@ -8,7 +8,7 @@
         "parameters": [
           {
             "name": "albumId",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "format": "uuid",
@@ -30,6 +30,15 @@
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ReactionLevel"
+            }
+          },
+          {
+            "name": "parentId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
             }
           },
           {
@@ -163,7 +172,7 @@
         "parameters": [
           {
             "name": "albumId",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "format": "uuid",
@@ -275,6 +284,74 @@
           }
         ],
         "x-immich-permission": "activity.delete",
+        "x-immich-state": "Stable"
+      },
+      "put": {
+        "description": "Updates a comment. Only the owner of the comment can update it.",
+        "operationId": "updateActivity",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivityUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Update an activity",
+        "tags": [
+          "Activities"
+        ],
+        "x-immich-history": [
+          {
+            "version": "v1",
+            "state": "Added"
+          },
+          {
+            "version": "v1",
+            "state": "Beta"
+          },
+          {
+            "version": "v2",
+            "state": "Stable"
+          }
+        ],
+        "x-immich-permission": "activity.update",
         "x-immich-state": "Stable"
       }
     },
@@ -15243,6 +15320,14 @@
           "comment": {
             "type": "string"
           },
+          "parentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reaction": {
+            "maxLength": 32,
+            "type": "string"
+          },
           "type": {
             "allOf": [
               {
@@ -15252,13 +15337,16 @@
           }
         },
         "required": [
-          "albumId",
           "type"
         ],
         "type": "object"
       },
       "ActivityResponseDto": {
         "properties": {
+          "albumId": {
+            "nullable": true,
+            "type": "string"
+          },
           "assetId": {
             "nullable": true,
             "type": "string"
@@ -15271,7 +15359,20 @@
             "format": "date-time",
             "type": "string"
           },
+          "editedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
+            "type": "string"
+          },
+          "parentId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reaction": {
+            "nullable": true,
             "type": "string"
           },
           "type": {
@@ -15286,6 +15387,7 @@
           }
         },
         "required": [
+          "albumId",
           "assetId",
           "createdAt",
           "id",
@@ -15301,11 +15403,26 @@
           },
           "likes": {
             "type": "integer"
+          },
+          "reactions": {
+            "type": "integer"
           }
         },
         "required": [
           "comments",
-          "likes"
+          "likes",
+          "reactions"
+        ],
+        "type": "object"
+      },
+      "ActivityUpdateDto": {
+        "properties": {
+          "comment": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "comment"
         ],
         "type": "object"
       },
@@ -20040,7 +20157,8 @@
       "ReactionType": {
         "enum": [
           "comment",
-          "like"
+          "like",
+          "reaction"
         ],
         "type": "string"
       },

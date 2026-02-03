@@ -25,7 +25,14 @@ describe(ActivityService.name, () => {
 
       await expect(sut.getAll(factory.auth({ user: { id: userId } }), { assetId, albumId })).resolves.toEqual([]);
 
-      expect(mocks.activity.search).toHaveBeenCalledWith({ assetId, albumId, isLiked: undefined });
+      expect(mocks.activity.search).toHaveBeenCalledWith({
+        assetId,
+        albumId,
+        isLiked: undefined,
+        userId: undefined,
+        parentId: undefined,
+        assetOnly: false,
+      });
     });
 
     it('should filter by type=like', async () => {
@@ -38,7 +45,14 @@ describe(ActivityService.name, () => {
         sut.getAll(factory.auth({ user: { id: userId } }), { assetId, albumId, type: ReactionType.LIKE }),
       ).resolves.toEqual([]);
 
-      expect(mocks.activity.search).toHaveBeenCalledWith({ assetId, albumId, isLiked: true });
+      expect(mocks.activity.search).toHaveBeenCalledWith({
+        assetId,
+        albumId,
+        isLiked: true,
+        userId: undefined,
+        parentId: undefined,
+        assetOnly: false,
+      });
     });
 
     it('should filter by type=comment', async () => {
@@ -49,7 +63,14 @@ describe(ActivityService.name, () => {
 
       await expect(sut.getAll(factory.auth(), { assetId, albumId, type: ReactionType.COMMENT })).resolves.toEqual([]);
 
-      expect(mocks.activity.search).toHaveBeenCalledWith({ assetId, albumId, isLiked: false });
+      expect(mocks.activity.search).toHaveBeenCalledWith({
+        assetId,
+        albumId,
+        isLiked: undefined,
+        userId: undefined,
+        parentId: undefined,
+        assetOnly: false,
+      });
     });
   });
 
@@ -57,10 +78,14 @@ describe(ActivityService.name, () => {
     it('should get the comment and like count', async () => {
       const [albumId, assetId] = newUuids();
 
-      mocks.activity.getStatistics.mockResolvedValue({ comments: 1, likes: 3 });
+      mocks.activity.getStatistics.mockResolvedValue({ comments: 1, likes: 3, reactions: 0 });
       mocks.access.album.checkOwnerAccess.mockResolvedValue(new Set([albumId]));
 
-      await expect(sut.getStatistics(factory.auth(), { assetId, albumId })).resolves.toEqual({ comments: 1, likes: 3 });
+      await expect(sut.getStatistics(factory.auth(), { assetId, albumId })).resolves.toEqual({
+        comments: 1,
+        likes: 3,
+        reactions: 0,
+      });
     });
   });
 
@@ -93,6 +118,8 @@ describe(ActivityService.name, () => {
         assetId: activity.assetId,
         comment: 'comment',
         isLiked: false,
+        parentId: null,
+        reaction: null,
       });
     });
 
@@ -118,7 +145,15 @@ describe(ActivityService.name, () => {
 
       await sut.create(factory.auth({ user: { id: userId } }), { albumId, assetId, type: ReactionType.LIKE });
 
-      expect(mocks.activity.create).toHaveBeenCalledWith({ userId: activity.userId, albumId, assetId, isLiked: true });
+      expect(mocks.activity.create).toHaveBeenCalledWith({
+        userId: activity.userId,
+        albumId,
+        assetId,
+        isLiked: true,
+        comment: null,
+        parentId: null,
+        reaction: null,
+      });
     });
 
     it('should skip if like exists', async () => {

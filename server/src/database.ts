@@ -65,12 +65,15 @@ export type Activity = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  albumId: string;
+  albumId: string | null;
   userId: string;
   user: User;
   assetId: string | null;
+  parentId: string | null;
   comment: string | null;
+  reaction: string | null;
   isLiked: boolean;
+  editedAt: Date | null;
   updateId: string;
 };
 

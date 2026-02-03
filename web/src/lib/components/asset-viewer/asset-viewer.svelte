@@ -464,8 +464,14 @@
     }
   });
   $effect(() => {
-    if (album && isShared && asset.id) {
-      handlePromiseError(activityManager.init(album.id, asset.id));
+    // Initialize activity manager for both album assets and standalone assets
+    if (asset.id) {
+      if (album && isShared) {
+        handlePromiseError(activityManager.init(album.id, asset.id));
+      } else {
+        // For non-album assets, pass undefined for albumId
+        handlePromiseError(activityManager.init(undefined, asset.id));
+      }
     }
   });
 
@@ -525,11 +531,16 @@
     return 'PhotoViewer';
   });
 
+  // Show activity status for all assets (shared albums or standalone assets)
   const showActivityStatus = $derived(
     $slideshowState === SlideshowState.None &&
-      isShared &&
-      ((album && album.isActivityEnabled) || activityManager.commentCount > 0) &&
-      !activityManager.isLoading,
+      !activityManager.isLoading &&
+      (isShared ? (album && album.isActivityEnabled) || activityManager.commentCount > 0 : true),
+  );
+
+  // Show activity panel for all assets
+  const showActivityPanel = $derived(
+    assetViewerManager.isShowActivityPanel && $user && (isShared ? album !== undefined : true),
   );
 
   const showOcrButton = $derived(
@@ -664,11 +675,9 @@
     {#if showActivityStatus}
       <div class="absolute bottom-0 end-0 mb-20 me-8">
         <ActivityStatus
-          disabled={!album?.isActivityEnabled}
-          isLiked={activityManager.isLiked}
-          numberOfComments={activityManager.commentCount}
-          numberOfLikes={activityManager.likeCount}
-          onFavorite={handleFavorite}
+          disabled={album ? !album.isActivityEnabled : false}
+          numberOfComments={activityManager.totalCommentCount}
+          numberOfReactions={activityManager.assetReactionCount}
         />
       </div>
     {/if}
@@ -772,7 +781,7 @@
     </div>
   {/if}
 
-  {#if isShared && album && assetViewerManager.isShowActivityPanel && $user}
+  {#if showActivityPanel}
     <div
       transition:fly={{ duration: 150 }}
       id="activity-panel"
@@ -781,10 +790,10 @@
     >
       <ActivityViewer
         user={$user}
-        disabled={!album.isActivityEnabled}
+        disabled={album ? !album.isActivityEnabled : false}
         assetType={asset.type}
-        albumOwnerId={album.ownerId}
-        albumId={album.id}
+        albumOwnerId={album?.ownerId}
+        albumId={album?.id}
         assetId={asset.id}
       />
     </div>

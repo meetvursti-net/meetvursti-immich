@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Endpoint, HistoryBuilder } from 'src/decorators';
@@ -8,6 +8,7 @@ import {
   ActivityResponseDto,
   ActivitySearchDto,
   ActivityStatisticsResponseDto,
+  ActivityUpdateDto,
 } from 'src/dtos/activity.dto';
 import { AuthDto } from 'src/dtos/auth.dto';
 import { ApiTag, Permission } from 'src/enum';
@@ -60,6 +61,21 @@ export class ActivityController {
   })
   getActivityStatistics(@Auth() auth: AuthDto, @Query() dto: ActivityDto): Promise<ActivityStatisticsResponseDto> {
     return this.service.getStatistics(auth, dto);
+  }
+
+  @Put(':id')
+  @Authenticated({ permission: Permission.ActivityUpdate })
+  @Endpoint({
+    summary: 'Update an activity',
+    description: 'Updates a comment. Only the owner of the comment can update it.',
+    history: new HistoryBuilder().added('v1').beta('v1').stable('v2'),
+  })
+  updateActivity(
+    @Auth() auth: AuthDto,
+    @Param() { id }: UUIDParamDto,
+    @Body() dto: ActivityUpdateDto,
+  ): Promise<ActivityResponseDto> {
+    return this.service.update(auth, id, dto);
   }
 
   @Delete(':id')

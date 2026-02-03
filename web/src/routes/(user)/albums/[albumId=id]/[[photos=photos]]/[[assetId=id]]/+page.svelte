@@ -451,10 +451,8 @@
         <div class="absolute z-2 bottom-0 end-0 mb-6 me-6 justify-self-end">
           <ActivityStatus
             disabled={!album.isActivityEnabled}
-            isLiked={activityManager.isLiked}
-            numberOfComments={activityManager.commentCount}
-            numberOfLikes={undefined}
-            onFavorite={handleFavorite}
+            numberOfComments={activityManager.totalCommentCount}
+            numberOfReactions={activityManager.assetReactionCount}
           />
         </div>
       {/if}

@@ -24,10 +24,9 @@ describe(ActivityController.name, () => {
       expect(ctx.authenticate).toHaveBeenCalled();
     });
 
-    it('should require an albumId', async () => {
-      const { status, body } = await request(ctx.getHttpServer()).get('/activities');
-      expect(status).toEqual(400);
-      expect(body).toEqual(factory.responses.badRequest(expect.arrayContaining(['albumId must be a UUID'])));
+    it('should accept requests without albumId when assetId is provided', async () => {
+      const { status } = await request(ctx.getHttpServer()).get('/activities').query({ assetId: factory.uuid() });
+      expect(status).toEqual(200);
     });
 
     it('should reject an invalid albumId', async () => {

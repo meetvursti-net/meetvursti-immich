@@ -23,22 +23,32 @@ export type UserResponseDto = {
     profileImagePath: string;
 };
 export type ActivityResponseDto = {
+    albumId: string | null;
     assetId: string | null;
     comment?: string | null;
     createdAt: string;
+    editedAt?: string | null;
     id: string;
+    parentId?: string | null;
+    reaction?: string | null;
     "type": ReactionType;
     user: UserResponseDto;
 };
 export type ActivityCreateDto = {
-    albumId: string;
+    albumId?: string;
     assetId?: string;
     comment?: string;
+    parentId?: string;
+    reaction?: string;
     "type": ReactionType;
 };
 export type ActivityStatisticsResponseDto = {
     comments: number;
     likes: number;
+    reactions: number;
+};
+export type ActivityUpdateDto = {
+    comment: string;
 };
 export type DatabaseBackupDeleteDto = {
     backups: string[];
@@ -1882,10 +1892,11 @@ export type WorkflowUpdateDto = {
 /**
  * List all activities
  */
-export function getActivities({ albumId, assetId, level, $type, userId }: {
-    albumId: string;
+export function getActivities({ albumId, assetId, level, parentId, $type, userId }: {
+    albumId?: string;
     assetId?: string;
     level?: ReactionLevel;
+    parentId?: string;
     $type?: ReactionType;
     userId?: string;
 }, opts?: Oazapfts.RequestOpts) {
@@ -1896,6 +1907,7 @@ export function getActivities({ albumId, assetId, level, $type, userId }: {
         albumId,
         assetId,
         level,
+        parentId,
         "type": $type,
         userId
     }))}`, {
@@ -1921,7 +1933,7 @@ export function createActivity({ activityCreateDto }: {
  * Retrieve activity statistics
  */
 export function getActivityStatistics({ albumId, assetId }: {
-    albumId: string;
+    albumId?: string;
     assetId?: string;
 }, opts?: Oazapfts.RequestOpts) {
     return oazapfts.ok(oazapfts.fetchJson<{
@@ -1944,6 +1956,22 @@ export function deleteActivity({ id }: {
         ...opts,
         method: "DELETE"
     }));
+}
+/**
+ * Update an activity
+ */
+export function updateActivity({ id, activityUpdateDto }: {
+    id: string;
+    activityUpdateDto: ActivityUpdateDto;
+}, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: ActivityResponseDto;
+    }>(`/activities/${encodeURIComponent(id)}`, oazapfts.json({
+        ...opts,
+        method: "PUT",
+        body: activityUpdateDto
+    })));
 }
 /**
  * Unlink all OAuth accounts
@@ -5400,7 +5428,8 @@ export enum ReactionLevel {
 }
 export enum ReactionType {
     Comment = "comment",
-    Like = "like"
+    Like = "like",
+    Reaction = "reaction"
 }
 export enum UserAvatarColor {
     Primary = "primary",
