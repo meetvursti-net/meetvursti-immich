@@ -19,10 +19,11 @@ import {
 
 @Table('activity')
 @UpdatedAtTrigger('activity_updatedAt')
-// Unique index for reactions (emoji or like) per user per asset/album combination
+// Unique index for reactions (emoji or like) per user per asset/album/parent combination
+// Includes parentId to allow same emoji on asset and on comments within that asset
 @Index({
   name: 'activity_reaction_idx',
-  columns: ['assetId', 'userId', 'albumId', 'reaction'],
+  columns: ['assetId', 'userId', 'albumId', 'reaction', 'parentId'],
   unique: true,
   where: '(reaction IS NOT NULL)',
 })

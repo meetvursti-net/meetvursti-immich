@@ -357,7 +357,7 @@ limit
 with
   "asset" as (
     select
-      date_trunc('MONTH', "localDateTime" AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' as "timeBucket"
+      date_trunc('MONTH', asset."localDateTime" AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' as "timeBucket"
     from
       "asset"
     where
@@ -430,7 +430,7 @@ with
     where
       "asset"."deletedAt" is null
       and "asset"."visibility" in ('archive', 'timeline')
-      and date_trunc('MONTH', "localDateTime" AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' = $3
+      and date_trunc('MONTH', asset."localDateTime" AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' = $3
       and not exists (
         select
         from

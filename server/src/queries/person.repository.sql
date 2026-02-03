@@ -33,7 +33,7 @@ from
   and "asset"."visibility" = 'timeline'
   and "asset"."deletedAt" is null
 where
-  "person"."ownerId" = $1
+  "person"."ownerId" in ($1)
   and "asset_face"."deletedAt" is null
   and "asset_face"."isVisible" is true
   and "person"."isHidden" = $2

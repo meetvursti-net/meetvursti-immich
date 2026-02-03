@@ -188,6 +188,16 @@ where
   "person"."id" in ($1)
   and "person"."ownerId" = $2
 
+-- AccessRepository.person.checkPartnerAccess
+select
+  "person"."id"
+from
+  "partner"
+  inner join "person" on "person"."ownerId" = "partner"."sharedById"
+where
+  "partner"."sharedWithId" = $1
+  and "person"."id" in ($2)
+
 -- AccessRepository.person.checkFaceOwnerAccess
 select
   "asset_face"."id"
@@ -198,6 +208,19 @@ from
 where
   "asset_face"."id" in ($1)
   and "asset"."ownerId" = $2
+
+-- AccessRepository.person.checkFacePartnerAccess
+select
+  "asset_face"."id"
+from
+  "partner"
+  inner join "asset" on "asset"."ownerId" = "partner"."sharedById"
+  inner join "asset_face" on "asset_face"."assetId" = "asset"."id"
+where
+  "partner"."sharedWithId" = $1
+  and "asset_face"."id" in ($2)
+  and "asset"."deletedAt" is null
+  and "asset_face"."deletedAt" is null
 
 -- AccessRepository.partner.checkUpdateAccess
 select
@@ -233,7 +256,6 @@ from
   "tag"
 where
   "tag"."id" in ($1)
-  and "tag"."userId" = $2
 
 -- AccessRepository.timeline.checkPartnerAccess
 select

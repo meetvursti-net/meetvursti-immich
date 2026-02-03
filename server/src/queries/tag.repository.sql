@@ -24,10 +24,20 @@ select
 from
   "tag"
 where
-  "userId" = $1
-  and "value" = $2
+  "value" = $1
 
 -- TagRepository.upsertValue
+select
+  "tag"."id",
+  "tag"."value",
+  "tag"."createdAt",
+  "tag"."updatedAt",
+  "tag"."color",
+  "tag"."parentId"
+from
+  "tag"
+where
+  "value" = $1
 begin
 insert into
   "tag" ("userId", "value", "parentId")
@@ -55,8 +65,6 @@ select
   "tag"."parentId"
 from
   "tag"
-where
-  "userId" = $1
 order by
   "value"
 

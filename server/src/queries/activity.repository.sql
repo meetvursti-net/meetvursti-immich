@@ -25,15 +25,73 @@ from
   left join "asset" on "asset"."id" = "activity"."assetId"
 where
   "activity"."albumId" = $1
-  and "asset"."deletedAt" is null
+  and (
+    (
+      "asset"."deletedAt" is null
+      and "asset"."visibility" != 'locked'
+    )
+    or "asset"."id" is null
+  )
 order by
   "activity"."createdAt" asc
+
+-- ActivityRepository.getById
+select
+  "activity".*,
+  to_json("user") as "user"
+from
+  "activity"
+  inner join "user" as "user2" on "user2"."id" = "activity"."userId"
+  and "user2"."deletedAt" is null
+  inner join lateral (
+    select
+      "user2"."id",
+      "user2"."name",
+      "user2"."email",
+      "user2"."avatarColor",
+      "user2"."profileImagePath",
+      "user2"."profileChangedAt"
+    from
+      (
+        select
+          1
+      ) as "dummy"
+  ) as "user" on true
+where
+  "activity"."id" = $1::uuid
 
 -- ActivityRepository.create
 insert into
   "activity" ("albumId", "userId")
 values
   ($1, $2)
+returning
+  *,
+  (
+    select
+      to_json(obj)
+    from
+      (
+        select
+          "id",
+          "name",
+          "email",
+          "avatarColor",
+          "profileImagePath",
+          "profileChangedAt"
+        from
+          "user"
+        where
+          "user"."id" = "activity"."userId"
+      ) as obj
+  ) as "user"
+
+-- ActivityRepository.update
+update "activity"
+set
+  "comment" = $1
+where
+  "id" = $2::uuid
 returning
   *,
   (
@@ -64,12 +122,20 @@ where
 select
   count(*) filter (
     where
-      "activity"."isLiked" = $1
+      (
+        "activity"."isLiked" = $1
+        and "activity"."reaction" is null
+        and "activity"."parentId" is null
+      )
   ) as "comments",
   count(*) filter (
     where
       "activity"."isLiked" = $2
-  ) as "likes"
+  ) as "likes",
+  count(*) filter (
+    where
+      "activity"."reaction" is not null
+  ) as "reactions"
 from
   "activity"
   inner join "user" on "user"."id" = "activity"."userId"

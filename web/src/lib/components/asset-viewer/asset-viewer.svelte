@@ -216,6 +216,40 @@
     bottomSwipeStartY = 0;
   };
 
+  // Swipe gesture state for mobile activity panel
+  let activitySwipeStartY = $state(0);
+  let activitySwipeCurrentY = $state(0);
+  let isActivitySwiping = $state(false);
+
+  const handleActivitySwipeStart = (e: TouchEvent) => {
+    activitySwipeStartY = e.touches[0].clientY;
+    activitySwipeCurrentY = activitySwipeStartY;
+    isActivitySwiping = true;
+  };
+
+  const handleActivitySwipeMove = (e: TouchEvent) => {
+    if (!isActivitySwiping) return;
+    activitySwipeCurrentY = e.touches[0].clientY;
+  };
+
+  const handleActivitySwipeEnd = () => {
+    if (!isActivitySwiping) {
+      isActivitySwiping = false;
+      return;
+    }
+
+    const swipeDistance = activitySwipeCurrentY - activitySwipeStartY;
+
+    // Swipe down to close activity panel
+    if (showActivityPanel && swipeDistance > SWIPE_THRESHOLD) {
+      assetViewerManager.toggleActivityPanel();
+    }
+
+    isActivitySwiping = false;
+    activitySwipeStartY = 0;
+    activitySwipeCurrentY = 0;
+  };
+
   const setPlayOriginalVideo = (value: boolean) => {
     playOriginalVideo = value;
   };
@@ -605,7 +639,8 @@
 
   <!-- Asset Viewer -->
   <div
-    class="relative col-start-1 col-span-4 row-start-1 row-span-full transition-all duration-150 {assetViewerManager.isShowDetailPanel
+    class="relative col-start-1 col-span-4 row-start-1 row-span-full transition-all duration-150 {assetViewerManager.isShowDetailPanel ||
+    showActivityPanel
       ? 'max-md:h-1/3 max-md:overflow-hidden'
       : ''}"
   >
@@ -700,7 +735,7 @@
       transition:fly={{ duration: 150 }}
       id="detail-panel"
       class="fixed md:relative bottom-0 md:bottom-auto left-0 md:left-auto right-0 md:right-auto
-        h-2/3 md:h-auto w-full md:w-90
+        h-2/3 md:h-auto w-full md:w-115
         row-start-1 row-span-4
         overflow-y-auto transition-all
         dark:border-t md:dark:border-t-0 dark:border-l-0 md:dark:border-l dark:border-s-immich-dark-gray
@@ -785,17 +820,36 @@
     <div
       transition:fly={{ duration: 150 }}
       id="activity-panel"
-      class="row-start-1 row-span-5 w-90 md:w-115 overflow-y-auto transition-all dark:border-l dark:border-s-immich-dark-gray"
+      class="fixed md:relative bottom-0 md:bottom-auto left-0 md:left-auto right-0 md:right-auto
+        h-2/3 md:h-full w-full md:w-115
+        row-start-1 row-span-5
+        overflow-hidden transition-all
+        dark:border-t md:dark:border-t-0 dark:border-l-0 md:dark:border-l dark:border-s-immich-dark-gray
+        bg-light z-10 md:z-auto
+        rounded-t-2xl md:rounded-none"
       translate="yes"
     >
-      <ActivityViewer
-        user={$user}
-        disabled={album ? !album.isActivityEnabled : false}
-        assetType={asset.type}
-        albumOwnerId={album?.ownerId}
-        albumId={album?.id}
-        assetId={asset.id}
-      />
+      <!-- Mobile drag handle -->
+      <div
+        class="md:hidden w-full py-2 flex justify-center cursor-grab active:cursor-grabbing touch-none"
+        use:swipe={{
+          onSwipeStart: handleActivitySwipeStart,
+          onSwipeMove: handleActivitySwipeMove,
+          onSwipeEnd: handleActivitySwipeEnd,
+        }}
+      >
+        <div class="w-10 h-1 bg-gray-400 dark:bg-gray-600 rounded-full"></div>
+      </div>
+      <div class="h-full" style="max-height: calc(100% - 20px);">
+        <ActivityViewer
+          user={$user}
+          disabled={album ? !album.isActivityEnabled : false}
+          assetType={asset.type}
+          albumOwnerId={album?.ownerId}
+          albumId={album?.id}
+          assetId={asset.id}
+        />
+      </div>
     </div>
   {/if}
 </section>

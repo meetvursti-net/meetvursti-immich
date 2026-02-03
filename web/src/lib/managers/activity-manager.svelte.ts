@@ -71,8 +71,14 @@ class ActivityManager {
   }
 
   // Get all unique asset-level reactions for display (excludes comment reactions)
-  get reactionSummary(): { reaction: string; count: number; users: { id: string; name: string }[] }[] {
-    const reactionMap = new Map<string, { count: number; users: { id: string; name: string }[] }>();
+  // Only returns reactions when viewing an asset (not album-level)
+  get reactionSummary(): { reaction: string; count: number; activities: ActivityResponseDto[] }[] {
+    // Don't show reactions when viewing album-level (reactions are for specific assets)
+    if (!this.#assetId) {
+      return [];
+    }
+
+    const reactionMap = new Map<string, { count: number; activities: ActivityResponseDto[] }>();
 
     for (const activity of this.#activities) {
       // Only include asset-level reactions (no parentId means not a comment reaction)
@@ -80,9 +86,9 @@ class ActivityManager {
         const existing = reactionMap.get(activity.reaction);
         if (existing) {
           existing.count++;
-          existing.users.push({ id: activity.user.id, name: activity.user.name });
+          existing.activities.push(activity);
         } else {
-          reactionMap.set(activity.reaction, { count: 1, users: [{ id: activity.user.id, name: activity.user.name }] });
+          reactionMap.set(activity.reaction, { count: 1, activities: [activity] });
         }
       }
     }
@@ -94,6 +100,9 @@ class ActivityManager {
 
   // Get total reaction count for asset-level reactions only
   get assetReactionCount(): number {
+    if (!this.#assetId) {
+      return 0;
+    }
     return this.#activities.filter((a) => a.type === ReactionType.Reaction && !a.parentId).length;
   }
 
@@ -102,21 +111,39 @@ class ActivityManager {
     return this.#activities.filter((a) => a.type === ReactionType.Comment).length;
   }
 
-  // Get comment reactions with user details
+  // Get activities for display - filters based on current context
+  // When viewing album-level (no assetId), only show album-level activities (no assetId on activity)
+  // When viewing asset-level (with assetId), show asset-specific activities
+  get displayActivities(): ActivityResponseDto[] {
+    if (this.#assetId) {
+      // Viewing an asset: show activities for this specific asset
+      return this.#activities;
+    } else {
+      // Viewing album-level: only show activities that don't have an assetId
+      return this.#activities.filter((a) => !a.assetId);
+    }
+  }
+
+  // Get total comment count for display context
+  get displayCommentCount(): number {
+    return this.displayActivities.filter((a) => a.type === ReactionType.Comment).length;
+  }
+
+  // Get comment reactions with full activity details (for avatars)
   getCommentReactionDetails(
     commentId: string,
-  ): { reaction: string; count: number; users: { id: string; name: string }[] }[] {
+  ): { reaction: string; count: number; activities: ActivityResponseDto[] }[] {
     const reactions = this.#activities.filter((a) => a.type === ReactionType.Reaction && a.parentId === commentId);
-    const reactionMap = new Map<string, { count: number; users: { id: string; name: string }[] }>();
+    const reactionMap = new Map<string, { count: number; activities: ActivityResponseDto[] }>();
 
     for (const r of reactions) {
       if (r.reaction) {
         const existing = reactionMap.get(r.reaction);
         if (existing) {
           existing.count++;
-          existing.users.push({ id: r.user.id, name: r.user.name });
+          existing.activities.push(r);
         } else {
-          reactionMap.set(r.reaction, { count: 1, users: [{ id: r.user.id, name: r.user.name }] });
+          reactionMap.set(r.reaction, { count: 1, activities: [r] });
         }
       }
     }
@@ -257,14 +284,40 @@ class ActivityManager {
     });
   }
 
-  async addCommentReaction(commentId: string, emoji: string) {
-    return this.addActivity({
-      albumId: this.#albumId,
-      assetId: this.#assetId,
-      type: ReactionType.Reaction,
-      reaction: emoji,
-      parentId: commentId,
-    });
+  // Get the current user's reaction to a specific comment
+  getUserCommentReaction(commentId: string): ActivityResponseDto | null {
+    const currentUserId = get(user).id;
+    return (
+      this.#activities.find(
+        (a) => a.type === ReactionType.Reaction && a.parentId === commentId && a.user.id === currentUserId,
+      ) ?? null
+    );
+  }
+
+  // Set or toggle comment reaction (only one reaction per user per comment)
+  async setCommentReaction(commentId: string, emoji: string | null) {
+    const existingReaction = this.getUserCommentReaction(commentId);
+
+    // If user has existing reaction, remove it first
+    if (existingReaction) {
+      await this.deleteActivity(existingReaction);
+
+      // If clicking same emoji or null, just remove (toggle off)
+      if (!emoji || existingReaction.reaction === emoji) {
+        return;
+      }
+    }
+
+    // Add new reaction if emoji is provided
+    if (emoji) {
+      await this.addActivity({
+        albumId: this.#albumId,
+        assetId: this.#assetId,
+        type: ReactionType.Reaction,
+        reaction: emoji,
+        parentId: commentId,
+      });
+    }
   }
 
   // Get replies to a specific comment

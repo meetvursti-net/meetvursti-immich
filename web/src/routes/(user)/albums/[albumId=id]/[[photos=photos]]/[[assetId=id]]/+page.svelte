@@ -1,6 +1,7 @@
 <script lang="ts">
   import { afterNavigate, goto, onNavigate } from '$app/navigation';
   import { scrollMemoryClearer } from '$lib/actions/scroll-memory';
+  import { swipe } from '$lib/actions/swipe';
   import ActionButton from '$lib/components/ActionButton.svelte';
   import AlbumDescription from '$lib/components/album-page/album-description.svelte';
   import AlbumMap from '$lib/components/album-page/album-map.svelte';
@@ -93,6 +94,41 @@
 
   let backUrl: string = $state(Route.albums());
   let viewMode: AlbumPageViewMode = $state(AlbumPageViewMode.VIEW);
+
+  // Swipe gesture state for mobile activity panel
+  let activitySwipeStartY = $state(0);
+  let activitySwipeCurrentY = $state(0);
+  let isActivitySwiping = $state(false);
+  const SWIPE_THRESHOLD = 50;
+
+  const handleActivitySwipeStart = (e: TouchEvent) => {
+    activitySwipeStartY = e.touches[0].clientY;
+    activitySwipeCurrentY = activitySwipeStartY;
+    isActivitySwiping = true;
+  };
+
+  const handleActivitySwipeMove = (e: TouchEvent) => {
+    if (!isActivitySwiping) return;
+    activitySwipeCurrentY = e.touches[0].clientY;
+  };
+
+  const handleActivitySwipeEnd = () => {
+    if (!isActivitySwiping) {
+      isActivitySwiping = false;
+      return;
+    }
+
+    const swipeDistance = activitySwipeCurrentY - activitySwipeStartY;
+
+    // Swipe down to close activity panel
+    if (assetViewerManager.isShowActivityPanel && swipeDistance > SWIPE_THRESHOLD) {
+      assetViewerManager.toggleActivityPanel();
+    }
+
+    isActivitySwiping = false;
+    activitySwipeStartY = 0;
+    activitySwipeCurrentY = 0;
+  };
 
   let timelineManager = $state<TimelineManager>() as TimelineManager;
   let showAlbumUsers = $derived(timelineManager?.showAssetOwners ?? false);
@@ -627,13 +663,29 @@
     {/if}
   </div>
   {#if album.albumUsers.length > 0 && album && assetViewerManager.isShowActivityPanel && $user && !$showAssetViewer}
-    <div class="flex">
+    <div
+      transition:fly={{ duration: 150 }}
+      id="activity-panel"
+      class="fixed md:relative bottom-0 md:bottom-auto left-0 md:left-auto right-0 md:right-auto
+        h-2/3 md:h-[calc(100vh-4rem)] w-full md:w-115
+        overflow-hidden transition-all
+        dark:border-t md:dark:border-t-0 dark:border-l-0 md:dark:border-l dark:border-s-immich-dark-gray
+        bg-light z-10 md:z-auto
+        rounded-t-2xl md:rounded-none"
+      translate="yes"
+    >
+      <!-- Mobile drag handle -->
       <div
-        transition:fly={{ duration: 150 }}
-        id="activity-panel"
-        class="z-2 w-90 md:w-115 overflow-y-auto transition-all dark:border-l dark:border-s-immich-dark-gray"
-        translate="yes"
+        class="md:hidden w-full py-2 flex justify-center cursor-grab active:cursor-grabbing touch-none"
+        use:swipe={{
+          onSwipeStart: handleActivitySwipeStart,
+          onSwipeMove: handleActivitySwipeMove,
+          onSwipeEnd: handleActivitySwipeEnd,
+        }}
       >
+        <div class="w-10 h-1 bg-gray-400 dark:bg-gray-600 rounded-full"></div>
+      </div>
+      <div class="h-full" style="max-height: calc(100% - 20px);">
         <ActivityViewer
           user={$user}
           disabled={!album.isActivityEnabled}

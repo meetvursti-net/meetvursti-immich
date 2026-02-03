@@ -766,6 +766,8 @@
   "clear_file_cache": "Clear File Cache",
   "clear_message": "Clear message",
   "clear_value": "Clear value",
+  "click_to_react": "Click to react with this emoji",
+  "click_to_remove_reaction": "Click to remove your reaction",
   "client_cert_dialog_msg_confirm": "OK",
   "client_cert_enter_password": "Enter Password",
   "client_cert_import": "Import",
