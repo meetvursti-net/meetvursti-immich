@@ -434,6 +434,7 @@ export type AlbumResponseDto = {
     hasSharedLink: boolean;
     id: string;
     isActivityEnabled: boolean;
+    isHiddenFromTimeline: boolean;
     lastModifiedAssetTimestamp?: string;
     order?: AssetOrder;
     owner: UserResponseDto;
@@ -470,6 +471,7 @@ export type UpdateAlbumDto = {
     albumThumbnailAssetId?: string;
     description?: string;
     isActivityEnabled?: boolean;
+    isHiddenFromTimeline?: boolean;
     order?: AssetOrder;
 };
 export type BulkIdsDto = {

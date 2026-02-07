@@ -1253,6 +1253,8 @@
   "height": "Height",
   "hi_user": "Hi {name} ({email})",
   "hide_all_people": "Hide all people",
+  "hide_from_timeline": "Hide from timeline",
+  "hide_from_timeline_description": "Hide photos and videos in this album from the main timeline",
   "hide_gallery": "Hide gallery",
   "hide_named_person": "Hide person {name}",
   "hide_password": "Hide password",

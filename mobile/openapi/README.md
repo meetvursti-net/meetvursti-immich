@@ -83,6 +83,7 @@ Class | Method | HTTP request | Description
 *ActivitiesApi* | [**deleteActivity**](doc//ActivitiesApi.md#deleteactivity) | **DELETE** /activities/{id} | Delete an activity
 *ActivitiesApi* | [**getActivities**](doc//ActivitiesApi.md#getactivities) | **GET** /activities | List all activities
 *ActivitiesApi* | [**getActivityStatistics**](doc//ActivitiesApi.md#getactivitystatistics) | **GET** /activities/statistics | Retrieve activity statistics
+*ActivitiesApi* | [**updateActivity**](doc//ActivitiesApi.md#updateactivity) | **PUT** /activities/{id} | Update an activity
 *AlbumsApi* | [**addAssetsToAlbum**](doc//AlbumsApi.md#addassetstoalbum) | **PUT** /albums/{id}/assets | Add assets to an album
 *AlbumsApi* | [**addAssetsToAlbums**](doc//AlbumsApi.md#addassetstoalbums) | **PUT** /albums/assets | Add assets to albums
 *AlbumsApi* | [**addUsersToAlbum**](doc//AlbumsApi.md#adduserstoalbum) | **PUT** /albums/{id}/users | Share album with users
@@ -335,6 +336,7 @@ Class | Method | HTTP request | Description
  - [ActivityCreateDto](doc//ActivityCreateDto.md)
  - [ActivityResponseDto](doc//ActivityResponseDto.md)
  - [ActivityStatisticsResponseDto](doc//ActivityStatisticsResponseDto.md)
+ - [ActivityUpdateDto](doc//ActivityUpdateDto.md)
  - [AddUsersDto](doc//AddUsersDto.md)
  - [AdminOnboardingUpdateDto](doc//AdminOnboardingUpdateDto.md)
  - [AlbumResponseDto](doc//AlbumResponseDto.md)
@@ -388,6 +390,7 @@ Class | Method | HTTP request | Description
  - [AssetOcrResponseDto](doc//AssetOcrResponseDto.md)
  - [AssetOrder](doc//AssetOrder.md)
  - [AssetResponseDto](doc//AssetResponseDto.md)
+ - [AssetSortBy](doc//AssetSortBy.md)
  - [AssetStackResponseDto](doc//AssetStackResponseDto.md)
  - [AssetStatsResponseDto](doc//AssetStatsResponseDto.md)
  - [AssetTypeEnum](doc//AssetTypeEnum.md)

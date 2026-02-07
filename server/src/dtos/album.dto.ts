@@ -84,6 +84,9 @@ export class UpdateAlbumDto {
   @ValidateBoolean({ optional: true })
   isActivityEnabled?: boolean;
 
+  @ValidateBoolean({ optional: true })
+  isHiddenFromTimeline?: boolean;
+
   @ValidateEnum({ enum: AssetOrder, name: 'AssetOrder', optional: true })
   order?: AssetOrder;
 }
@@ -155,6 +158,7 @@ export class AlbumResponseDto {
   startDate?: Date;
   endDate?: Date;
   isActivityEnabled!: boolean;
+  isHiddenFromTimeline!: boolean;
   @ValidateEnum({ enum: AssetOrder, name: 'AssetOrder', optional: true })
   order?: AssetOrder;
 
@@ -177,6 +181,7 @@ export type MapAlbumDto = {
   ownerId: string;
   owner: User;
   isActivityEnabled: boolean;
+  isHiddenFromTimeline: boolean;
   order: AssetOrder;
 };
 
@@ -224,6 +229,7 @@ export const mapAlbum = (entity: MapAlbumDto, withAssets: boolean, auth?: AuthDt
     assets: (withAssets ? assets : []).map((asset) => mapAsset(asset, { auth })),
     assetCount: entity.assets?.length || 0,
     isActivityEnabled: entity.isActivityEnabled,
+    isHiddenFromTimeline: entity.isHiddenFromTimeline,
     order: entity.order,
   };
 };

@@ -18,5 +18,6 @@ export const albumFactory = Sync.makeFactory<AlbumResponseDto>({
   albumUsers: [],
   hasSharedLink: false,
   isActivityEnabled: true,
+  isHiddenFromTimeline: false,
   order: AssetOrder.Desc,
 });

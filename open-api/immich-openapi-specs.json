@@ -15502,6 +15502,9 @@
           "isActivityEnabled": {
             "type": "boolean"
           },
+          "isHiddenFromTimeline": {
+            "type": "boolean"
+          },
           "lastModifiedAssetTimestamp": {
             "format": "date-time",
             "type": "string"
@@ -15542,6 +15545,7 @@
           "hasSharedLink",
           "id",
           "isActivityEnabled",
+          "isHiddenFromTimeline",
           "owner",
           "ownerId",
           "shared",
@@ -23849,6 +23853,9 @@
             "type": "string"
           },
           "isActivityEnabled": {
+            "type": "boolean"
+          },
+          "isHiddenFromTimeline": {
             "type": "boolean"
           },
           "order": {

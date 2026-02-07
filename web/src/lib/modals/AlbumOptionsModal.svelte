@@ -58,6 +58,8 @@
 
   const { AddUsers, CreateSharedLink } = $derived(getAlbumActions($t, album));
 
+  const isOwner = $derived($user?.id === album.ownerId);
+
   let sharedLinks: SharedLinkResponseDto[] = $state([]);
 
   onMount(async () => {
@@ -95,6 +97,13 @@
             <Switch
               checked={album.isActivityEnabled}
               onCheckedChange={(checked) => handleUpdateAlbum(album, { isActivityEnabled: checked })}
+            />
+          </Field>
+          <Field label={$t('hide_from_timeline')} description={$t('hide_from_timeline_description')}>
+            <Switch
+              checked={album.isHiddenFromTimeline}
+              onCheckedChange={(checked) => handleUpdateAlbum(album, { isHiddenFromTimeline: checked })}
+              disabled={!isOwner}
             />
           </Field>
         </div>
